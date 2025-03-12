@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { Layout } from '@/components/Layout';
-import { Dashboard } from '@/components/Dashboard';
+import { Profile } from '@/components/Profile';
 
-const Index = () => {
+const ProfilePage = () => {
   return (
     <Layout>
-      <Dashboard />
+      <Profile />
     </Layout>
   );
 };
 
-export default Index;
+export default ProfilePage;
