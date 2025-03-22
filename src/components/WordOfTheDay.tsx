@@ -1,9 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { Button } from './ui/button';
-import { RefreshCw } from 'lucide-react';
 
 // List of environmental words with their definitions
 const environmentalWords = [
@@ -82,11 +79,6 @@ export function WordOfTheDay() {
     console.log('New random word selected:', todaysWord.word);
   };
   
-  const handleRefresh = () => {
-    // Force refresh the word regardless of date
-    getRandomWord();
-  };
-  
   useEffect(() => {
     const today = new Date().toDateString();
     
@@ -127,15 +119,6 @@ export function WordOfTheDay() {
             <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200">
               Word of the Day
             </Badge>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={handleRefresh} 
-              className="h-8 w-8 rounded-full"
-              title="Get new word"
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
           </div>
           <div className="space-y-1">
             <h3 className="font-medium text-lg text-green-800">{wordOfDay.word}</h3>
