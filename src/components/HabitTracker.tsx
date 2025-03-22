@@ -81,10 +81,10 @@ export function HabitTracker() {
     },
     {
       id: 'water',
-      name: 'Short shower',
-      description: 'Keep your shower under 5 minutes',
+      name: 'Cold shower',
+      description: 'Switch to cold showers',
       icon: DropletIcon,
-      impact: 'Saves up to 35L of water per shower',
+      impact: 'Reduces water heating energy consumption, potentially saving money and lowering carbon emissions',
     },
     {
       id: 'recycle',
