@@ -83,10 +83,10 @@ export function Profile() {
       
       <div className="text-center">
         <Avatar className="h-24 w-24 mx-auto">
-          <AvatarImage src="https://randomuser.me/api/portraits/women/17.jpg" alt="Alex Morgan" />
+          <AvatarImage src="https://randomuser.me/api/portraits/women/17.jpg" alt="Paul Joshua Mamaril" />
           <AvatarFallback>AM</AvatarFallback>
         </Avatar>
-        <h1 className="text-2xl font-medium mt-4">Alex Morgan</h1>
+        <h1 className="text-2xl font-medium mt-4">Paul Joshua Mamaril</h1>
         <p className="text-muted-foreground">Sustainability Enthusiast</p>
         <div className="flex justify-center mt-2 space-x-2">
           <Badge variant="outline" className="bg-primary/10 text-primary">Level 8</Badge>
