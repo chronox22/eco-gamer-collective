@@ -68,6 +68,7 @@ export function Education() {
           <TabsTrigger value="water" className="py-2 text-xs">Water</TabsTrigger>
           <TabsTrigger value="waste" className="py-2 text-xs">Waste</TabsTrigger>
           <TabsTrigger value="energy" className="py-2 text-xs">Energy</TabsTrigger>
+          <TabsTrigger value="energy" className="py-2 text-xs">Smart Waster</TabsTrigger>
         </TabsList>
         
         <TabsContent value="all" className="mt-6 space-y-4">
