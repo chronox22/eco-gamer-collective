@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { RefreshCw } from 'lucide-react';
 
 // List of environmental words with their definitions
 const environmentalWords = [
@@ -58,39 +60,61 @@ const environmentalWords = [
 export function WordOfTheDay() {
   const [wordOfDay, setWordOfDay] = useState<{ word: string; definition: string } | null>(null);
   
+  // Function to get a random word
+  const getRandomWord = () => {
+    // Generate a new random word
+    const randomIndex = Math.floor(Math.random() * environmentalWords.length);
+    const todaysWord = environmentalWords[randomIndex];
+    
+    // Get today's date
+    const today = new Date().toDateString();
+    
+    // Store in localStorage
+    localStorage.setItem('wordOfTheDay', JSON.stringify({
+      date: today,
+      word: todaysWord.word,
+      definition: todaysWord.definition
+    }));
+    
+    setWordOfDay(todaysWord);
+    
+    // Log for debugging
+    console.log('New random word selected:', todaysWord.word);
+  };
+  
+  const handleRefresh = () => {
+    // Force refresh the word regardless of date
+    getRandomWord();
+  };
+  
   useEffect(() => {
-    // Function to get a random word
-    const getRandomWord = () => {
-      const today = new Date().toDateString();
-      
-      // Check if we already generated a word today
-      const storedWordData = localStorage.getItem('wordOfTheDay');
-      
-      if (storedWordData) {
+    const today = new Date().toDateString();
+    
+    // Check if we already generated a word today
+    const storedWordData = localStorage.getItem('wordOfTheDay');
+    
+    if (storedWordData) {
+      try {
         const { date, word, definition } = JSON.parse(storedWordData);
         
         // If the stored date is today, use the stored word
         if (date === today) {
+          console.log('Using existing word for today:', word);
           setWordOfDay({ word, definition });
-          return;
+        } else {
+          // Date is different, get a new word
+          console.log('Date changed, getting new word');
+          getRandomWord();
         }
+      } catch (error) {
+        console.error('Error parsing stored word data:', error);
+        getRandomWord();
       }
-      
-      // Generate a new random word for today
-      const randomIndex = Math.floor(Math.random() * environmentalWords.length);
-      const todaysWord = environmentalWords[randomIndex];
-      
-      // Store in localStorage
-      localStorage.setItem('wordOfTheDay', JSON.stringify({
-        date: today,
-        word: todaysWord.word,
-        definition: todaysWord.definition
-      }));
-      
-      setWordOfDay(todaysWord);
-    };
-    
-    getRandomWord();
+    } else {
+      // No stored word, get a new one
+      console.log('No stored word found, getting new word');
+      getRandomWord();
+    }
   }, []);
   
   if (!wordOfDay) return null;
@@ -103,6 +127,15 @@ export function WordOfTheDay() {
             <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200">
               Word of the Day
             </Badge>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleRefresh} 
+              className="h-8 w-8 rounded-full"
+              title="Get new word"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
           </div>
           <div className="space-y-1">
             <h3 className="font-medium text-lg text-green-800">{wordOfDay.word}</h3>
