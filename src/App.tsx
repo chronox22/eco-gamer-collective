@@ -12,23 +12,7 @@ import ProfilePage from "./pages/ProfilePage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import NotFound from "./pages/NotFound";
-
-// Check if Clerk is available
-const clerkAvailable = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? true : false;
-
-// Conditionally import Clerk components
-let ClerkComponents: any = {};
-if (clerkAvailable) {
-  try {
-    const clerk = require('@clerk/clerk-react');
-    ClerkComponents = {
-      ClerkLoaded: clerk.ClerkLoaded,
-      ClerkLoading: clerk.ClerkLoading
-    };
-  } catch (error) {
-    console.error("Failed to import Clerk components:", error);
-  }
-}
+import { ClerkLoaded, ClerkLoading } from '@clerk/clerk-react';
 
 const queryClient = new QueryClient();
 
@@ -38,28 +22,12 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        {clerkAvailable ? (
-          <>
-            <ClerkComponents.ClerkLoading>
-              <div className="h-screen w-full flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-              </div>
-            </ClerkComponents.ClerkLoading>
-            <ClerkComponents.ClerkLoaded>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/habits" element={<HabitsPage />} />
-                <Route path="/learn" element={<LearnPage />} />
-                <Route path="/community" element={<CommunityPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/sign-in/*" element={<SignInPage />} />
-                <Route path="/sign-up/*" element={<SignUpPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </ClerkComponents.ClerkLoaded>
-          </>
-        ) : (
-          // Render routes directly when Clerk is not available
+        <ClerkLoading>
+          <div className="h-screen w-full flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        </ClerkLoading>
+        <ClerkLoaded>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/habits" element={<HabitsPage />} />
@@ -70,7 +38,7 @@ const App = () => (
             <Route path="/sign-up/*" element={<SignUpPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        )}
+        </ClerkLoaded>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
