@@ -4,6 +4,7 @@ import { Leaf, Cloud, DropletIcon, Recycle } from 'lucide-react';
 import { ProgressRing } from './ui/ProgressRing';
 import { MetricCard } from './ui/MetricCard';
 import { Separator } from '@/components/ui/separator';
+import { WordOfTheDay } from './WordOfTheDay';
 
 export function Dashboard() {
   return (
@@ -15,6 +16,8 @@ export function Dashboard() {
         <h1 className="text-3xl font-medium tracking-tight">Good morning</h1>
         <p className="text-muted-foreground">Your environmental impact today</p>
       </div>
+      
+      <WordOfTheDay />
       
       <div className="flex justify-center">
         <ProgressRing 

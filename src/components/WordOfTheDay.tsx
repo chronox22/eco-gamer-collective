@@ -1,0 +1,117 @@
+
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from './ui/card';
+import { Badge } from './ui/badge';
+
+// List of environmental words with their definitions
+const environmentalWords = [
+  {
+    word: "Sustainability",
+    definition: "Meeting the needs of the present without compromising future generations' ability to meet their own needs."
+  },
+  {
+    word: "Biodiversity",
+    definition: "The variety of plant and animal life in the world or in a particular habitat."
+  },
+  {
+    word: "Conservation",
+    definition: "Protection, preservation, and careful management of natural resources and environment."
+  },
+  {
+    word: "Renewable",
+    definition: "A natural resource or source of energy that is not depleted when used."
+  },
+  {
+    word: "Ecosystem",
+    definition: "A biological community of interacting organisms and their physical environment."
+  },
+  {
+    word: "Compost",
+    definition: "Decayed organic material used as a fertilizer for growing plants."
+  },
+  {
+    word: "Recycling",
+    definition: "Converting waste materials into new materials and objects."
+  },
+  {
+    word: "Carbon Footprint",
+    definition: "The amount of carbon dioxide released into the atmosphere as a result of one's activities."
+  },
+  {
+    word: "Upcycling",
+    definition: "Reusing discarded objects or material to create a product of higher quality or value."
+  },
+  {
+    word: "Zero-waste",
+    definition: "A philosophy that encourages the redesign of resource life cycles so that all products are reused."
+  },
+  {
+    word: "Permaculture",
+    definition: "The development of agricultural ecosystems intended to be sustainable and self-sufficient."
+  },
+  {
+    word: "Greenwashing",
+    definition: "Disinformation disseminated by an organization to present an environmentally responsible public image."
+  }
+];
+
+export function WordOfTheDay() {
+  const [wordOfDay, setWordOfDay] = useState<{ word: string; definition: string } | null>(null);
+  
+  useEffect(() => {
+    // Function to get a random word
+    const getRandomWord = () => {
+      const today = new Date().toDateString();
+      
+      // Check if we already generated a word today
+      const storedWordData = localStorage.getItem('wordOfTheDay');
+      
+      if (storedWordData) {
+        const { date, word, definition } = JSON.parse(storedWordData);
+        
+        // If the stored date is today, use the stored word
+        if (date === today) {
+          setWordOfDay({ word, definition });
+          return;
+        }
+      }
+      
+      // Generate a new random word for today
+      const randomIndex = Math.floor(Math.random() * environmentalWords.length);
+      const todaysWord = environmentalWords[randomIndex];
+      
+      // Store in localStorage
+      localStorage.setItem('wordOfTheDay', JSON.stringify({
+        date: today,
+        word: todaysWord.word,
+        definition: todaysWord.definition
+      }));
+      
+      setWordOfDay(todaysWord);
+    };
+    
+    getRandomWord();
+  }, []);
+  
+  if (!wordOfDay) return null;
+  
+  return (
+    <Card className="mb-6 border-green-100 bg-green-50/50">
+      <CardContent className="p-4">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200">
+              Word of the Day
+            </Badge>
+          </div>
+          <div className="space-y-1">
+            <h3 className="font-medium text-lg text-green-800">{wordOfDay.word}</h3>
+            <p className="text-sm text-muted-foreground">
+              {wordOfDay.definition}
+            </p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
