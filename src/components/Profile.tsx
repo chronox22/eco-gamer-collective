@@ -87,7 +87,7 @@ export function Profile() {
           <AvatarFallback>AM</AvatarFallback>
         </Avatar>
         <h1 className="text-2xl font-medium mt-4">Paul Joshua Mamaril</h1>
-        <p className="text-muted-foreground">Sustainability Enthusiast</p>
+        <p className="text-muted-foreground">Certified Kupal</p>
         <div className="flex justify-center mt-2 space-x-2">
           <Badge variant="outline" className="bg-primary/10 text-primary">Level 8</Badge>
           <Badge variant="outline">2,498 points</Badge>
