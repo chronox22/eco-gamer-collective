@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Check, Bike, Coffee, DropletIcon, Recycle, Lightbulb, Plant, Sun, Trash2, Wind, Battery } from 'lucide-react';
+import { Check, Bike, Coffee, DropletIcon, Recycle, Lightbulb, Flower, Sun, Trash2, Wind, Battery } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -101,7 +101,7 @@ export function HabitTracker() {
         id: 'plant',
         name: 'Plant a seed',
         description: 'Grow your own food or plants',
-        icon: Plant,
+        icon: Flower,
         impact: 'Improves air quality and reduces food miles',
       },
       {
