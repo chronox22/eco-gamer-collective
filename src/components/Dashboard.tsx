@@ -60,9 +60,9 @@ export function Dashboard() {
     <section className="space-y-6 animate-fade-in">
       <div className="space-y-2">
         <div className="inline-block bg-primary/10 px-3 py-1 rounded-full">
-          <span className="text-sm font-medium text-primary">Today</span>
+          <span className="text-sm font-medium text-primary">Welcome to Chrono X</span>
         </div>
-        <h1 className="text-3xl font-medium tracking-tight">Good morning</h1>
+        <h1 className="text-3xl font-medium tracking-tight">Good day</h1>
         <p className="text-muted-foreground">Your environmental impact today</p>
       </div>
       
