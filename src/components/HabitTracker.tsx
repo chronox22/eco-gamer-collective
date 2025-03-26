@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 interface HabitItemProps {
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<any>;
   impact: string;
   completed?: boolean;
   onClick?: () => void;
