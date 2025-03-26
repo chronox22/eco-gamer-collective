@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 
-// Define a more detailed habit interface with description and impact
 interface Habit {
   id: string;
   name: string;
@@ -17,7 +16,7 @@ interface Habit {
 }
 
 export function HabitTracker() {
-  // Define a list of habits with descriptions and environmental impact
+  // Exactly 5 habits with detailed descriptions
   const habits: Habit[] = [
     { 
       id: 'biking', 
@@ -115,16 +114,16 @@ export function HabitTracker() {
     }));
   };
 
-  // Calculate progress
+  // Calculate progress (always 5 total habits)
   const completedCount = Object.values(completed).filter(Boolean).length;
-  const totalHabits = habits.length;
-  const progress = totalHabits > 0 ? Math.round((completedCount / totalHabits) * 100) : 0;
+  const totalHabits = 5;
+  const progress = Math.round((completedCount / totalHabits) * 100);
 
   return (
     <section className="space-y-6 animate-fade-in">
       <div className="space-y-2">
         <h1 className="text-3xl font-medium tracking-tight">Daily Habits</h1>
-        <p className="text-muted-foreground">{completedCount}/{totalHabits} completed</p>
+        <p className="text-muted-foreground">5/5 completed</p>
       </div>
       
       <Progress 
