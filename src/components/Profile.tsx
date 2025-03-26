@@ -92,11 +92,11 @@ export function Profile() {
           <AvatarImage src="https://scontent.fmnl17-7.fna.fbcdn.net/v/t1.15752-9/485700300_1220675332910388_2057545410610368668_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeFairmy4bBLoAjpZPJ0OCTHH66CG-Z29asfroIb5nb1q8Fnh-O6NhN9j8MINdAmZXwe9bEAeGSg0sC-xf7aXs06&_nc_ohc=DuuPvLorEucQ7kNvgF2Qp5a&_nc_oc=Adnv06x0dZiMFGCsxSnYi-AUnjlTot8y4BHvuft47Y_D9YXE2CcQRgGMW8cBeYcRowY&_nc_zt=23&_nc_ht=scontent.fmnl17-7.fna&oh=03_Q7cD1wFHtGdY51_dK4EGtpu3WHRXo88VxC5Z2oc6FT0hH70mJQ&oe=6805B987" alt="Paul Joshua Mamaril" />
           <AvatarFallback>AM</AvatarFallback>
         </Avatar>
-        <h1 className="text-2xl font-medium mt-4">Paul Joshua Mamaril</h1>
-        <p className="text-muted-foreground">Certified Kupal</p>
+        <h1 className="text-2xl font-medium mt-4">User</h1>
+        <p className="text-muted-foreground">Eco Lover</p>
         <div className="flex justify-center mt-2 space-x-2">
-          <Badge variant="outline" className="bg-primary/10 text-primary">Level 8</Badge>
-          <Badge variant="outline">2,498 points</Badge>
+          <Badge variant="outline" className="bg-primary/10 text-primary">Level 1</Badge>
+          <Badge variant="outline">0 points</Badge>
         </div>
       </div>
       
