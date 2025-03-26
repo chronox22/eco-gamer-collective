@@ -161,9 +161,8 @@ export function HabitTracker() {
       
       // Initialize completed state
       const initialCompleted: Record<string, boolean> = {};
-      selectedHabits.forEach((habit, index) => {
-        // Randomly mark some as completed for demonstration
-        initialCompleted[habit.id] = index < 2;
+      selectedHabits.forEach(habit => {
+        initialCompleted[habit.id] = false;
       });
       
       // Store the new data
