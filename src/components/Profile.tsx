@@ -95,8 +95,8 @@ export function Profile() {
         <h1 className="text-2xl font-medium mt-4">User</h1>
         <p className="text-muted-foreground">PROTOTYPE ONLY</p>
         <div className="flex justify-center mt-2 space-x-2">
-          <Badge variant="outline" className="bg-primary/10 text-primary">Level 1</Badge>
-          <Badge variant="outline">0 points</Badge>
+          <Badge variant="outline" className="bg-primary/10 text-primary">Level 4</Badge>
+          <Badge variant="outline">999 points</Badge>
         </div>
       </div>
       
