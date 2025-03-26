@@ -5,6 +5,7 @@ import { Check, Bike, Coffee, DropletIcon, Recycle, Lightbulb } from 'lucide-rea
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Progress } from '@/components/ui/progress';
 
 // Define a simple habit interface
 interface Habit {
@@ -90,9 +91,15 @@ export function HabitTracker() {
   return (
     <section className="space-y-6 animate-fade-in">
       <div className="space-y-2">
-        <h1 className="text-3xl font-medium tracking-tight">Simple Habit Tracker</h1>
-        <p className="text-muted-foreground">Track your daily habits: {completedCount}/{totalHabits} completed</p>
+        <h1 className="text-3xl font-medium tracking-tight">Habits</h1>
+        <p className="text-muted-foreground">{completedCount}/{totalHabits} completed</p>
       </div>
+      
+      <Progress 
+        value={progress} 
+        className="h-2 w-full" 
+        aria-label="Habits completion progress"
+      />
 
       <div className="space-y-4">
         {habits.map((habit) => {
