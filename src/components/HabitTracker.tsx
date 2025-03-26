@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Check, Bike, Coffee, DropletIcon, Recycle, Lightbulb } from 'lucide-react';
+import { Check, Bike, Coffee, DropletIcon, Recycle, Lightbulb, Plant, Sun, Trash2, Wind, Battery } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -56,62 +56,150 @@ function HabitItem({ name, description, icon: Icon, impact, completed, onClick }
 }
 
 export function HabitTracker() {
-  const [completed, setCompleted] = React.useState({
-    biking: false,
-    reusable: true,
-    water: false,
-    recycle: true,
-    energy: false,
-  });
+  const [completed, setCompleted] = useState<Record<string, boolean>>({});
+  const [habitsForToday, setHabitsForToday] = useState<any[]>([]);
 
-  const habits = [
-    {
-      id: 'biking',
-      name: 'Bike to work',
-      description: 'Use a bike instead of a car for your commute',
-      icon: Bike,
-      impact: 'Saves 3.6kg of CO2 emissions',
-    },
-    {
-      id: 'reusable',
-      name: 'Use reusable cup',
-      description: 'Avoid disposable cups for your coffee or tea',
-      icon: Coffee,
-      impact: 'Saves 0.5kg of waste per week',
-    },
-    {
-      id: 'water',
-      name: 'Cold shower',
-      description: 'Switch to cold showers',
-      icon: DropletIcon,
-      impact: 'Reduces water heating energy consumption, potentially saving money and lowering carbon emissions',
-    },
-    {
-      id: 'recycle',
-      name: 'Recycled today',
-      description: 'Properly sort and recycle your waste',
-      icon: Recycle,
-      impact: 'Reduces landfill waste by 30%',
-    },
-    {
-      id: 'energy',
-      name: 'Energy saver',
-      description: 'Turn off lights and appliances when not in use',
-      icon: Lightbulb,
-      impact: 'Reduces energy consumption by 10%',
-    },
-  ];
+  useEffect(() => {
+    // All possible habits
+    const allHabits = [
+      {
+        id: 'biking',
+        name: 'Bike to work',
+        description: 'Use a bike instead of a car for your commute',
+        icon: Bike,
+        impact: 'Saves 3.6kg of CO2 emissions',
+      },
+      {
+        id: 'reusable',
+        name: 'Use reusable cup',
+        description: 'Avoid disposable cups for your coffee or tea',
+        icon: Coffee,
+        impact: 'Saves 0.5kg of waste per week',
+      },
+      {
+        id: 'water',
+        name: 'Cold shower',
+        description: 'Switch to cold showers',
+        icon: DropletIcon,
+        impact: 'Reduces water heating energy consumption',
+      },
+      {
+        id: 'recycle',
+        name: 'Recycled today',
+        description: 'Properly sort and recycle your waste',
+        icon: Recycle,
+        impact: 'Reduces landfill waste by 30%',
+      },
+      {
+        id: 'energy',
+        name: 'Energy saver',
+        description: 'Turn off lights and appliances when not in use',
+        icon: Lightbulb,
+        impact: 'Reduces energy consumption by 10%',
+      },
+      {
+        id: 'plant',
+        name: 'Plant a seed',
+        description: 'Grow your own food or plants',
+        icon: Plant,
+        impact: 'Improves air quality and reduces food miles',
+      },
+      {
+        id: 'solar',
+        name: 'Solar usage',
+        description: 'Use solar-powered devices when possible',
+        icon: Sun,
+        impact: 'Reduces reliance on grid electricity',
+      },
+      {
+        id: 'waste',
+        name: 'Zero waste meal',
+        description: 'Prepare a meal with zero food waste',
+        icon: Trash2,
+        impact: 'Reduces food waste and saves resources',
+      },
+      {
+        id: 'ventilation',
+        name: 'Natural ventilation',
+        description: 'Open windows instead of using air conditioning',
+        icon: Wind,
+        impact: 'Reduces electricity consumption significantly',
+      },
+      {
+        id: 'electronics',
+        name: 'Battery recycling',
+        description: 'Properly dispose of used batteries',
+        icon: Battery,
+        impact: 'Prevents toxic materials from entering landfills',
+      }
+    ];
+
+    // Load or initialize completed state
+    const loadCompletedState = () => {
+      const today = new Date().toDateString();
+      const storedData = localStorage.getItem('habitTrackerData');
+      
+      if (storedData) {
+        try {
+          const { date, completed: storedCompleted, habits: storedHabits } = JSON.parse(storedData);
+          
+          if (date === today) {
+            // Use stored data if it exists for today
+            setCompleted(storedCompleted);
+            setHabitsForToday(storedHabits);
+            return;
+          }
+        } catch (error) {
+          console.error('Error parsing stored habit data:', error);
+        }
+      }
+      
+      // Generate new habits for today
+      const seed = new Date().getDate();
+      const shuffled = [...allHabits].sort(() => 0.5 - Math.random());
+      const selectedHabits = shuffled.slice(0, 5);
+      
+      // Initialize completed state
+      const initialCompleted: Record<string, boolean> = {};
+      selectedHabits.forEach((habit, index) => {
+        // Randomly mark some as completed for demonstration
+        initialCompleted[habit.id] = index < 2;
+      });
+      
+      // Store the new data
+      localStorage.setItem('habitTrackerData', JSON.stringify({
+        date: today,
+        completed: initialCompleted,
+        habits: selectedHabits
+      }));
+      
+      setCompleted(initialCompleted);
+      setHabitsForToday(selectedHabits);
+    };
+    
+    loadCompletedState();
+  }, []);
 
   const toggleHabit = (id: string) => {
-    setCompleted(prev => ({
-      ...prev,
-      [id]: !prev[id as keyof typeof prev]
+    const newCompleted = {
+      ...completed,
+      [id]: !completed[id]
+    };
+    
+    setCompleted(newCompleted);
+    
+    // Update local storage
+    const today = new Date().toDateString();
+    localStorage.setItem('habitTrackerData', JSON.stringify({
+      date: today,
+      completed: newCompleted,
+      habits: habitsForToday
     }));
   };
 
   const completedCount = Object.values(completed).filter(Boolean).length;
-  const totalHabits = habits.length;
-  const progress = (completedCount / totalHabits) * 100;
+  const totalHabits = habitsForToday.length;
+  const progress = totalHabits > 0 ? (completedCount / totalHabits) * 100 : 0;
 
   return (
     <section className="space-y-6 animate-fade-in">
@@ -135,14 +223,14 @@ export function HabitTracker() {
       <Separator className="my-6" />
       
       <div className="space-y-4">
-        {habits.map((habit) => (
+        {habitsForToday.map((habit) => (
           <HabitItem
             key={habit.id}
             name={habit.name}
             description={habit.description}
             icon={habit.icon}
             impact={habit.impact}
-            completed={completed[habit.id as keyof typeof completed]}
+            completed={completed[habit.id]}
             onClick={() => toggleHabit(habit.id)}
           />
         ))}

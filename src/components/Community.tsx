@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Trophy, ChevronRight, Heart, MessageSquare } from 'lucide-react';
+import { Users, Trophy, ChevronRight, Heart, MessageSquare, ThumbsUp, Share } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
@@ -121,12 +121,16 @@ function PostCard({ name, avatar, time, content, likes, comments, image }: PostC
         )}
         <div className="flex items-center justify-between border-t pt-3">
           <Button variant="ghost" size="sm" className="flex items-center gap-1 text-muted-foreground">
-            <Heart className="h-4 w-4" />
+            <ThumbsUp className="h-4 w-4" />
             <span>{likes}</span>
           </Button>
           <Button variant="ghost" size="sm" className="flex items-center gap-1 text-muted-foreground">
             <MessageSquare className="h-4 w-4" />
             <span>{comments}</span>
+          </Button>
+          <Button variant="ghost" size="sm" className="flex items-center gap-1 text-muted-foreground">
+            <Share className="h-4 w-4" />
+            <span>Share</span>
           </Button>
         </div>
       </CardContent>
@@ -151,46 +155,79 @@ export function Community() {
         
         <TabsContent value="feed" className="mt-6 space-y-4">
           <PostCard 
-            name="Emma Thompson"
-            avatar="https://randomuser.me/api/portraits/women/33.jpg"
-            time="2 hours ago"
-            content="Just finished planting trees with the local community group! It's amazing what we can accomplish together. #TreePlanting #CommunityAction"
-            likes={24}
-            comments={5}
-            image="https://images.unsplash.com/photo-1576085898323-218337e3e43c?auto=format&fit=crop&q=80&w=400"
-          />
-          <PostCard 
-            name="Michael Chen"
-            avatar="https://randomuser.me/api/portraits/men/15.jpg"
-            time="Yesterday"
-            content="Found this amazing zero-waste store in my neighborhood. They have everything from food to household items with no packaging waste!"
+            name="Juan dela Cruz"
+            avatar="https://randomuser.me/api/portraits/men/33.jpg"
+            time="1 hour ago"
+            content="Nagtanim ako ng mga halamang gulay sa aming community garden kahapon! Sobrang nakakasiya pala ang magtanim. #UrbanGardening #SustainableLiving"
             likes={42}
             comments={8}
+            image="https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&q=80&w=400"
+          />
+          <PostCard 
+            name="Maria Santos"
+            avatar="https://randomuser.me/api/portraits/women/42.jpg"
+            time="3 hours ago"
+            content="May nakita akong zero-waste store sa Makati! Pwede dalhin ang sariling lalagyan para sa rice, beans, at iba pang pantry staples. Sino gusto sumama sa akin next week?"
+            likes={36}
+            comments={15}
+          />
+          <PostCard 
+            name="Arnel Pineda"
+            avatar="https://randomuser.me/api/portraits/men/22.jpg"
+            time="Yesterday"
+            content="Coastal cleanup drive sa Boracay ngayong weekend! Tara sama-sama tayong maglinis ng beach para mapanatili ang ganda ng ating isla. #CleanSeasPH"
+            likes={89}
+            comments={23}
+            image="https://images.unsplash.com/photo-1618477462146-050d2036391d?auto=format&fit=crop&q=80&w=400"
+          />
+          <PostCard 
+            name="Josephine Reyes"
+            avatar="https://randomuser.me/api/portraits/women/28.jpg"
+            time="2 days ago"
+            content="Binisita ko 'yung bag manufacturing company na gumagamit ng recycled plastic. Ang ganda ng output nila! Sustainable at fashionable pa. Proud ako sa Filipino craftmanship!"
+            likes={65}
+            comments={12}
+            image="https://images.unsplash.com/photo-1528323273322-d81458248d40?auto=format&fit=crop&q=80&w=400"
+          />
+          <PostCard 
+            name="Carlo Aquino"
+            avatar="https://randomuser.me/api/portraits/men/15.jpg"
+            time="3 days ago"
+            content="Nag-install na ako ng rainwater harvesting system sa bahay namin! Nakakatipid na kami sa tubig, nakakatulong pa sa environment. Win-win!"
+            likes={54}
+            comments={7}
           />
         </TabsContent>
         
         <TabsContent value="challenges" className="mt-6 space-y-4">
           <ChallengeCard 
-            title="30-Day Zero Waste Challenge"
-            description="Reduce your waste by following our daily actionable steps."
+            title="30-Day Plastic-Free Challenge"
+            description="Iwasan ang single-use plastics sa loob ng 30 araw."
             participants={283}
             daysLeft={18}
             progress={40}
             joined={true}
           />
           <ChallengeCard 
-            title="Public Transport Month"
-            description="Switch from driving to public transport for 30 days."
+            title="Meatless Monday Challenge"
+            description="Walang karne tuwing Lunes para sa kalusugan at kalikasan."
             participants={156}
             daysLeft={25}
             progress={15}
           />
           <ChallengeCard 
-            title="Local Food Challenge"
-            description="Source your food from local producers for 2 weeks."
+            title="Local Food Week"
+            description="Kumain ng locally produced foods lang sa loob ng isang linggo."
             participants={97}
             daysLeft={10}
             progress={65}
+          />
+          <ChallengeCard 
+            title="Energy Conservation Month"
+            description="Bawasan ang paggamit ng kuryente sa bahay."
+            participants={124}
+            daysLeft={22}
+            progress={30}
           />
         </TabsContent>
         
@@ -210,46 +247,64 @@ export function Community() {
               <ScrollArea className="h-[350px] pr-4">
                 <LeaderboardItem 
                   position={1}
-                  name="Olivia Kim"
+                  name="Manny Pacquiao"
                   points={2845}
-                  avatar="https://randomuser.me/api/portraits/women/43.jpg"
+                  avatar="https://randomuser.me/api/portraits/men/43.jpg"
                 />
                 <LeaderboardItem 
                   position={2}
-                  name="Samuel Wilson"
+                  name="Lea Salonga"
                   points={2756}
-                  avatar="https://randomuser.me/api/portraits/men/32.jpg"
+                  avatar="https://randomuser.me/api/portraits/women/32.jpg"
                 />
                 <LeaderboardItem 
                   position={3}
-                  name="Sophia Rodriguez"
+                  name="Isko Moreno"
                   points={2630}
-                  avatar="https://randomuser.me/api/portraits/women/68.jpg"
+                  avatar="https://randomuser.me/api/portraits/men/68.jpg"
                 />
                 <LeaderboardItem 
                   position={4}
-                  name="Daniel Lee"
+                  name="Angel Locsin"
                   points={2517}
-                  avatar="https://randomuser.me/api/portraits/men/75.jpg"
+                  avatar="https://randomuser.me/api/portraits/women/75.jpg"
                 />
                 <LeaderboardItem 
                   position={5}
-                  name="Alex Morgan"
+                  name="Paul Joshua Mamaril"
                   points={2498}
-                  avatar="https://randomuser.me/api/portraits/women/17.jpg"
+                  avatar="https://scontent.fmnl17-7.fna.fbcdn.net/v/t1.15752-9/485700300_1220675332910388_2057545410610368668_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeFairmy4bBLoAjpZPJ0OCTHH66CG-Z29asfroIb5nb1q8Fnh-O6NhN9j8MINdAmZXwe9bEAeGSg0sC-xf7aXs06&_nc_ohc=DuuPvLorEucQ7kNvgF2Qp5a&_nc_oc=Adnv06x0dZiMFGCsxSnYi-AUnjlTot8y4BHvuft47Y_D9YXE2CcQRgGMW8cBeYcRowY&_nc_zt=23&_nc_ht=scontent.fmnl17-7.fna&oh=03_Q7cD1wFHtGdY51_dK4EGtpu3WHRXo88VxC5Z2oc6FT0hH70mJQ&oe=6805B987"
                   isCurrentUser={true}
                 />
                 <LeaderboardItem 
                   position={6}
-                  name="James Taylor"
+                  name="Jasmine Curtis"
                   points={2340}
-                  avatar="https://randomuser.me/api/portraits/men/4.jpg"
+                  avatar="https://randomuser.me/api/portraits/women/4.jpg"
                 />
                 <LeaderboardItem 
                   position={7}
-                  name="Emily Davis"
+                  name="Piolo Pascual"
                   points={2285}
-                  avatar="https://randomuser.me/api/portraits/women/3.jpg"
+                  avatar="https://randomuser.me/api/portraits/men/3.jpg"
+                />
+                <LeaderboardItem 
+                  position={8}
+                  name="Liza Soberano"
+                  points={2242}
+                  avatar="https://randomuser.me/api/portraits/women/23.jpg"
+                />
+                <LeaderboardItem 
+                  position={9}
+                  name="Coco Martin"
+                  points={2190}
+                  avatar="https://randomuser.me/api/portraits/men/53.jpg"
+                />
+                <LeaderboardItem 
+                  position={10}
+                  name="Kathryn Bernardo"
+                  points={2088}
+                  avatar="https://randomuser.me/api/portraits/women/18.jpg"
                 />
               </ScrollArea>
             </CardContent>

@@ -1,12 +1,61 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Leaf, Cloud, DropletIcon, Recycle } from 'lucide-react';
 import { ProgressRing } from './ui/ProgressRing';
 import { MetricCard } from './ui/MetricCard';
 import { Separator } from '@/components/ui/separator';
 import { WordOfTheDay } from './WordOfTheDay';
+import { VerseOfTheDay } from './VerseOfTheDay';
 
 export function Dashboard() {
+  const [metrics, setMetrics] = useState({
+    carbonSaved: 2.4,
+    waterSaved: 18,
+    wasteReduced: 0.8,
+    treesImpact: 3
+  });
+
+  useEffect(() => {
+    // Generate daily metrics based on the date
+    const generateDailyMetrics = () => {
+      const today = new Date().toDateString();
+      const storedMetricsData = localStorage.getItem('dailyMetrics');
+      
+      if (storedMetricsData) {
+        try {
+          const { date, metrics: storedMetrics } = JSON.parse(storedMetricsData);
+          
+          if (date === today) {
+            // Use stored metrics if they exist for today
+            setMetrics(storedMetrics);
+            return;
+          }
+        } catch (error) {
+          console.error('Error parsing stored metrics:', error);
+        }
+      }
+      
+      // Create new metrics with small random variations each day
+      const seed = new Date().getDate() + new Date().getMonth() + 1;
+      const newMetrics = {
+        carbonSaved: parseFloat((2 + (seed % 3) * 0.3).toFixed(1)),
+        waterSaved: Math.floor(15 + (seed % 7) * 1.5),
+        wasteReduced: parseFloat((0.6 + (seed % 5) * 0.1).toFixed(1)),
+        treesImpact: Math.floor(2 + (seed % 4))
+      };
+      
+      // Store the new metrics
+      localStorage.setItem('dailyMetrics', JSON.stringify({
+        date: today,
+        metrics: newMetrics
+      }));
+      
+      setMetrics(newMetrics);
+    };
+    
+    generateDailyMetrics();
+  }, []);
+
   return (
     <section className="space-y-6 animate-fade-in">
       <div className="space-y-2">
@@ -18,6 +67,8 @@ export function Dashboard() {
       </div>
       
       <WordOfTheDay />
+      
+      <VerseOfTheDay />
       
       <div className="flex justify-center">
         <ProgressRing 
@@ -41,7 +92,7 @@ export function Dashboard() {
         <div className="grid grid-cols-2 gap-3">
           <MetricCard 
             title="Carbon Saved" 
-            value={2.4} 
+            value={metrics.carbonSaved} 
             suffix="kg" 
             icon={Cloud} 
             trend={{ value: 12, positive: true }}
@@ -49,14 +100,14 @@ export function Dashboard() {
           />
           <MetricCard 
             title="Water Saved" 
-            value={18} 
+            value={metrics.waterSaved} 
             suffix="L" 
             icon={DropletIcon} 
             trend={{ value: 5, positive: true }}
           />
           <MetricCard 
             title="Waste Reduced" 
-            value={0.8} 
+            value={metrics.wasteReduced} 
             suffix="kg" 
             icon={Recycle} 
             trend={{ value: 8, positive: true }}
@@ -64,7 +115,7 @@ export function Dashboard() {
           />
           <MetricCard 
             title="Trees Impact" 
-            value={3} 
+            value={metrics.treesImpact} 
             suffix="hrs" 
             icon={Leaf} 
             trend={{ value: 10, positive: true }}

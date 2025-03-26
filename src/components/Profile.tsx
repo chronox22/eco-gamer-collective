@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,10 +14,13 @@ import {
   TreePine, 
   Recycle, 
   Bike, 
-  DropletIcon 
+  DropletIcon,
+  MessageSquare,
+  Info
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface AchievementItemProps {
   title: string;
@@ -73,6 +76,9 @@ function AchievementItem({
 }
 
 export function Profile() {
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
+  const [creditsDialogOpen, setCreditsDialogOpen] = useState(false);
+  
   return (
     <section className="space-y-6 animate-fade-in">
       <div className="flex justify-end">
@@ -150,6 +156,26 @@ export function Profile() {
             icon={DropletIcon}
             progress={45}
           />
+          
+          <div className="grid grid-cols-2 gap-4 mt-8">
+            <Button 
+              className="w-full" 
+              variant="outline"
+              onClick={() => setFeedbackDialogOpen(true)}
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Share your feedback
+            </Button>
+            
+            <Button 
+              className="w-full" 
+              variant="outline"
+              onClick={() => setCreditsDialogOpen(true)}
+            >
+              <Info className="mr-2 h-4 w-4" />
+              Credits
+            </Button>
+          </div>
         </TabsContent>
         
         <TabsContent value="stats" className="mt-6">
@@ -200,6 +226,55 @@ export function Profile() {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* Feedback Dialog */}
+      <Dialog open={feedbackDialogOpen} onOpenChange={setFeedbackDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Share Your Feedback</DialogTitle>
+            <DialogDescription>
+              We'd love to hear your thoughts on how we can improve the app.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <textarea 
+              className="w-full min-h-[150px] p-3 rounded-md border border-input bg-background text-sm" 
+              placeholder="Tell us what you think about the app..."
+            />
+            <Button className="w-full">Submit Feedback</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Credits Dialog */}
+      <Dialog open={creditsDialogOpen} onOpenChange={setCreditsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Credits</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4 text-center">
+            <p className="text-muted-foreground">Developed by</p>
+            <h3 className="text-xl font-medium">Chrono X Developers</h3>
+            <div className="py-2">
+              <img 
+                src="https://lovable.dev/logo.png" 
+                alt="Lovable Logo" 
+                className="h-10 mx-auto"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Built with 💚 using Lovable
+            </p>
+            <Button 
+              variant="outline" 
+              className="w-full mt-4"
+              onClick={() => setCreditsDialogOpen(false)}
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
