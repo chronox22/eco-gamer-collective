@@ -89,7 +89,7 @@ export function Profile() {
       
       <div className="text-center">
         <Avatar className="h-24 w-24 mx-auto">
-          <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png />
+          <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png/>
           <AvatarFallback>AM</AvatarFallback>
         </Avatar>
         <h1 className="text-2xl font-medium mt-4">User</h1>
