@@ -7,21 +7,53 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 
-// Define a simple habit interface
+// Define a more detailed habit interface with description and impact
 interface Habit {
   id: string;
   name: string;
   icon: React.ElementType;
+  description: string;
+  impact: string;
 }
 
 export function HabitTracker() {
-  // Define a list of simple habits
+  // Define a list of habits with descriptions and environmental impact
   const habits: Habit[] = [
-    { id: 'biking', name: 'Bike to work', icon: Bike },
-    { id: 'reusable', name: 'Use reusable cup', icon: Coffee },
-    { id: 'water', name: 'Take cold shower', icon: DropletIcon },
-    { id: 'recycle', name: 'Recycle today', icon: Recycle },
-    { id: 'energy', name: 'Save energy', icon: Lightbulb },
+    { 
+      id: 'biking', 
+      name: 'Bike to work', 
+      icon: Bike,
+      description: 'Use a bike instead of a car for your commute',
+      impact: 'Saves 3.6kg of CO2 emissions'
+    },
+    { 
+      id: 'reusable', 
+      name: 'Use reusable cup', 
+      icon: Coffee,
+      description: 'Bring your own cup for coffee or drinks',
+      impact: 'Saves 9g of plastic waste'
+    },
+    { 
+      id: 'water', 
+      name: 'Take cold shower', 
+      icon: DropletIcon,
+      description: 'Reduce hot water usage by taking a cold shower',
+      impact: 'Saves 2.1kg of CO2 emissions'
+    },
+    { 
+      id: 'recycle', 
+      name: 'Recycle today', 
+      icon: Recycle,
+      description: 'Properly sort and recycle all eligible waste',
+      impact: 'Saves 1.8kg of landfill waste'
+    },
+    { 
+      id: 'energy', 
+      name: 'Save energy', 
+      icon: Lightbulb,
+      description: 'Turn off lights and appliances when not in use',
+      impact: 'Saves 1.4kg of CO2 emissions'
+    },
   ];
 
   // Track completed habits
@@ -91,7 +123,7 @@ export function HabitTracker() {
   return (
     <section className="space-y-6 animate-fade-in">
       <div className="space-y-2">
-        <h1 className="text-3xl font-medium tracking-tight">Habits</h1>
+        <h1 className="text-3xl font-medium tracking-tight">Daily Habits</h1>
         <p className="text-muted-foreground">{completedCount}/{totalHabits} completed</p>
       </div>
       
@@ -115,26 +147,36 @@ export function HabitTracker() {
               )}
             >
               <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center",
-                      isCompleted ? "bg-primary text-primary-foreground" : "bg-secondary"
-                    )}>
-                      <Icon className="h-5 w-5" />
+                <div className="flex flex-col space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center",
+                        isCompleted ? "bg-primary text-primary-foreground" : "bg-secondary"
+                      )}>
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <span className="font-medium">{habit.name}</span>
                     </div>
-                    <span className="font-medium">{habit.name}</span>
+                    
+                    <Button 
+                      size="sm" 
+                      variant={isCompleted ? "default" : "outline"}
+                      className="rounded-full w-10 h-10 p-0"
+                      onClick={() => toggleHabit(habit.id)}
+                    >
+                      <Check className="h-5 w-5" />
+                      <span className="sr-only">Complete</span>
+                    </Button>
                   </div>
                   
-                  <Button 
-                    size="sm" 
-                    variant={isCompleted ? "default" : "outline"}
-                    className="rounded-full w-10 h-10 p-0"
-                    onClick={() => toggleHabit(habit.id)}
-                  >
-                    <Check className="h-5 w-5" />
-                    <span className="sr-only">Complete</span>
-                  </Button>
+                  {/* Habit description and impact */}
+                  <div className="pl-13 ml-13">
+                    <div className="text-sm text-muted-foreground ml-13 pl-13">
+                      <p className="ml-13 pl-13">{habit.description}</p>
+                      <p className="font-medium text-green-600 mt-1">{habit.impact}</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
