@@ -89,7 +89,6 @@ export function Profile() {
       
       <div className="text-center">
         <Avatar className="h-24 w-24 mx-auto">
-          <AvatarImage src="https://www.tenforums.com/attachments/user-accounts-family-safety/322690d1615743307-user-account-image-log-user.png/>
           <AvatarFallback>AM</AvatarFallback>
         </Avatar>
         <h1 className="text-2xl font-medium mt-4">User</h1>
