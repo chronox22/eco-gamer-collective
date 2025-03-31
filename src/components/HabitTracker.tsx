@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Check, Bike, Coffee, DropletIcon, Recycle, Lightbulb, Award, Upload, Image } from 'lucide-react';
+import { Check, Bike, Coffee, DropletIcon, Recycle, Lightbulb, Award, Upload, Image, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -84,6 +85,7 @@ export function HabitTracker() {
   const [verifyingHabit, setVerifyingHabit] = useState<Habit | null>(null);
   const [verificationImage, setVerificationImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -125,8 +127,21 @@ export function HabitTracker() {
     saveToLocalStorage(initialCompleted);
   };
 
+  const resetHabits = () => {
+    initializeHabits();
+    toast({
+      title: "Habits Reset",
+      description: "All habits have been reset for today",
+    });
+  };
+
   const showVerification = (habit: Habit) => {
     setVerifyingHabit(habit);
+    setVerificationImage(null);
+    setVerificationStatus(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,6 +155,7 @@ export function HabitTracker() {
       if (e.target?.result) {
         setVerificationImage(e.target.result as string);
         setIsUploading(false);
+        setVerificationStatus(null);
         
         toast({
           title: "Image uploaded",
@@ -163,6 +179,7 @@ export function HabitTracker() {
   const resetVerificationState = () => {
     setVerifyingHabit(null);
     setVerificationImage(null);
+    setVerificationStatus(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -171,30 +188,40 @@ export function HabitTracker() {
   const completeHabit = () => {
     if (!verifyingHabit) return;
     
-    const id = verifyingHabit.id;
-    const newCompleted = {
-      ...completed,
-      [id]: true
-    };
-    
-    setCompleted(newCompleted);
-    
-    console.log(`Verification image for ${verifyingHabit.name}:`, verificationImage);
-    
-    saveToLocalStorage(newCompleted);
-    resetVerificationState();
-    
-    toast({
-      title: "Habit verified!",
-      description: `You've completed: ${verifyingHabit.name}`,
-    });
-    
-    const allCompleted = Object.values(newCompleted).every(Boolean) && 
-                       Object.keys(newCompleted).length === 5;
-    
-    if (allCompleted) {
-      setShowCompletionDialog(true);
+    if (!verificationImage) {
+      setVerificationStatus("Please upload an image");
+      return;
     }
+    
+    setVerificationStatus("Ongoing Verification...");
+    
+    // Simulate verification process
+    setTimeout(() => {
+      const id = verifyingHabit.id;
+      const newCompleted = {
+        ...completed,
+        [id]: true
+      };
+      
+      setCompleted(newCompleted);
+      
+      console.log(`Verification image for ${verifyingHabit.name}:`, verificationImage);
+      
+      saveToLocalStorage(newCompleted);
+      resetVerificationState();
+      
+      toast({
+        title: "Habit verified!",
+        description: `You've completed: ${verifyingHabit.name}`,
+      });
+      
+      const allCompleted = Object.values(newCompleted).every(Boolean) && 
+                         Object.keys(newCompleted).length === 5;
+      
+      if (allCompleted) {
+        setShowCompletionDialog(true);
+      }
+    }, 1500);
   };
 
   const saveToLocalStorage = (completedState: Record<string, boolean>) => {
@@ -225,13 +252,24 @@ export function HabitTracker() {
           <p className="text-muted-foreground">{completedCount}/5 completed</p>
         </div>
         
-        <ProgressRing 
-          progress={progress} 
-          size={100} 
-          strokeWidth={8}
-          showPercentage={true}
-          className="shrink-0"
-        />
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="outline" 
+            onClick={resetHabits}
+            className="flex items-center gap-2"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Reset Habits
+          </Button>
+          
+          <ProgressRing 
+            progress={progress} 
+            size={100} 
+            strokeWidth={8}
+            showPercentage={true}
+            className="shrink-0"
+          />
+        </div>
       </div>
       
       <Progress 
@@ -385,6 +423,7 @@ export function HabitTracker() {
                       onClick={(e) => {
                         e.stopPropagation();
                         setVerificationImage(null);
+                        setVerificationStatus(null);
                         if (fileInputRef.current) {
                           fileInputRef.current.value = '';
                         }
@@ -416,6 +455,17 @@ export function HabitTracker() {
                   </div>
                 )}
               </div>
+              
+              {verificationStatus && (
+                <div className={cn(
+                  "text-sm p-2 rounded-md text-center",
+                  verificationStatus === "Please upload an image" 
+                    ? "bg-destructive/10 text-destructive"
+                    : "bg-yellow-500/10 text-yellow-600"
+                )}>
+                  {verificationStatus}
+                </div>
+              )}
             </div>
           </div>
           <DialogFooter>
@@ -424,7 +474,7 @@ export function HabitTracker() {
             </Button>
             <Button 
               onClick={completeHabit}
-              disabled={isUploading}
+              disabled={isUploading || verificationStatus === "Ongoing Verification..."}
             >
               Confirm Completion
             </Button>
