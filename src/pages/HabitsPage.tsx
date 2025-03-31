@@ -6,7 +6,7 @@ import { HabitTracker } from '@/components/HabitTracker';
 const HabitsPage = () => {
   return (
     <Layout>
-      <div className="max-w-md mx-auto">
+      <div className="max-w-4xl mx-auto">
         <HabitTracker />
       </div>
     </Layout>

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
+import { ProgressRing } from '@/components/ui/ProgressRing';
 
 interface Habit {
   id: string;
@@ -121,9 +122,19 @@ export function HabitTracker() {
 
   return (
     <section className="space-y-6 animate-fade-in">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-medium tracking-tight">Daily Habits</h1>
-        <p className="text-muted-foreground">5/5 completed</p>
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-medium tracking-tight">Daily Habits</h1>
+          <p className="text-muted-foreground">{completedCount}/5 completed</p>
+        </div>
+        
+        <ProgressRing 
+          progress={progress} 
+          size={100} 
+          strokeWidth={8}
+          showPercentage={true}
+          className="shrink-0"
+        />
       </div>
       
       <Progress 
@@ -132,7 +143,7 @@ export function HabitTracker() {
         aria-label="Habits completion progress"
       />
 
-      <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2">
         {habits.map((habit) => {
           const isCompleted = completed[habit.id] || false;
           const Icon = habit.icon;
@@ -141,38 +152,36 @@ export function HabitTracker() {
             <Card 
               key={habit.id}
               className={cn(
-                "border transition-all duration-200", 
+                "border transition-all duration-200 hover:shadow-md", 
                 isCompleted ? "border-primary bg-primary/10" : ""
               )}
             >
               <CardContent className="p-4">
-                <div className="flex flex-col space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center",
-                        isCompleted ? "bg-primary text-primary-foreground" : "bg-secondary"
-                      )}>
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <span className="font-medium">{habit.name}</span>
-                    </div>
-                    
-                    <Button 
-                      size="sm" 
-                      variant={isCompleted ? "default" : "outline"}
-                      className="rounded-full w-10 h-10 p-0"
-                      onClick={() => toggleHabit(habit.id)}
-                    >
-                      <Check className="h-5 w-5" />
-                      <span className="sr-only">Complete</span>
-                    </Button>
+                <div className="flex items-start gap-3">
+                  <div className={cn(
+                    "mt-1 w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+                    isCompleted ? "bg-primary text-primary-foreground" : "bg-secondary"
+                  )}>
+                    <Icon className="h-5 w-5" />
                   </div>
                   
-                  {/* Habit description and impact */}
-                  <div className="pl-13 ml-13">
-                    <div className="text-sm text-muted-foreground ml-13 pl-13">
-                      <p className="ml-13 pl-13">{habit.description}</p>
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">{habit.name}</span>
+                      
+                      <Button 
+                        size="sm" 
+                        variant={isCompleted ? "default" : "outline"}
+                        className="rounded-full w-8 h-8 p-0"
+                        onClick={() => toggleHabit(habit.id)}
+                      >
+                        <Check className="h-4 w-4" />
+                        <span className="sr-only">Complete</span>
+                      </Button>
+                    </div>
+                    
+                    <div className="text-sm text-muted-foreground">
+                      <p>{habit.description}</p>
                       <p className="font-medium text-green-600 mt-1">{habit.impact}</p>
                     </div>
                   </div>
