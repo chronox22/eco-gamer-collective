@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Check, Bike, Coffee, DropletIcon, Recycle, Lightbulb, Award } from 'lucide-react';
@@ -16,6 +15,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 
 interface Habit {
@@ -24,51 +31,58 @@ interface Habit {
   icon: React.ElementType;
   description: string;
   impact: string;
+  verificationText: string;
 }
 
 export function HabitTracker() {
-  // Exactly 5 habits with detailed descriptions
+  // Exactly 5 habits with detailed descriptions and verification text
   const habits: Habit[] = [
     { 
       id: 'biking', 
       name: 'Bike to work', 
       icon: Bike,
       description: 'Use a bike instead of a car for your commute',
-      impact: 'Saves 3.6kg of CO2 emissions'
+      impact: 'Saves 3.6kg of CO2 emissions',
+      verificationText: 'Confirm that you commuted to work using a bicycle today'
     },
     { 
       id: 'reusable', 
       name: 'Use reusable cup', 
       icon: Coffee,
       description: 'Bring your own cup for coffee or drinks',
-      impact: 'Saves 9g of plastic waste'
+      impact: 'Saves 9g of plastic waste',
+      verificationText: 'Confirm that you used a reusable cup for your beverages today'
     },
     { 
       id: 'water', 
       name: 'Take cold shower', 
       icon: DropletIcon,
       description: 'Reduce hot water usage by taking a cold shower',
-      impact: 'Saves 2.1kg of CO2 emissions'
+      impact: 'Saves 2.1kg of CO2 emissions',
+      verificationText: 'Confirm that you took a cold shower to save energy'
     },
     { 
       id: 'recycle', 
       name: 'Recycle today', 
       icon: Recycle,
       description: 'Properly sort and recycle all eligible waste',
-      impact: 'Saves 1.8kg of landfill waste'
+      impact: 'Saves 1.8kg of landfill waste',
+      verificationText: 'Confirm that you properly sorted and recycled your waste today'
     },
     { 
       id: 'energy', 
       name: 'Save energy', 
       icon: Lightbulb,
       description: 'Turn off lights and appliances when not in use',
-      impact: 'Saves 1.4kg of CO2 emissions'
+      impact: 'Saves 1.4kg of CO2 emissions',
+      verificationText: 'Confirm that you turned off lights and unplugged unused appliances'
     },
   ];
 
   // Track completed habits
   const [completed, setCompleted] = useState<Record<string, boolean>>({});
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+  const [verifyingHabit, setVerifyingHabit] = useState<Habit | null>(null);
   const { toast } = useToast();
 
   // Load from localStorage on component mount
@@ -116,17 +130,31 @@ export function HabitTracker() {
     saveToLocalStorage(initialCompleted);
   };
 
-  // Toggle a habit's completion status
-  const toggleHabit = (id: string) => {
+  // Show verification dialog for a habit
+  const showVerification = (habit: Habit) => {
+    setVerifyingHabit(habit);
+  };
+
+  // Complete a habit after verification
+  const completeHabit = () => {
+    if (!verifyingHabit) return;
+    
+    const id = verifyingHabit.id;
     const newCompleted = {
       ...completed,
-      [id]: !completed[id]
+      [id]: true
     };
     
     setCompleted(newCompleted);
     saveToLocalStorage(newCompleted);
+    setVerifyingHabit(null);
     
-    // Check if all habits are completed after toggling
+    toast({
+      title: "Habit verified!",
+      description: `You've completed: ${verifyingHabit.name}`,
+    });
+    
+    // Check if all habits are completed after verification
     const allCompleted = Object.values(newCompleted).every(Boolean) && 
                        Object.keys(newCompleted).length === 5;
     
@@ -208,15 +236,20 @@ export function HabitTracker() {
                     <div className="flex items-center justify-between">
                       <span className="font-medium">{habit.name}</span>
                       
-                      <Button 
-                        size="sm" 
-                        variant={isCompleted ? "default" : "outline"}
-                        className="rounded-full w-8 h-8 p-0"
-                        onClick={() => toggleHabit(habit.id)}
-                      >
-                        <Check className="h-4 w-4" />
-                        <span className="sr-only">Complete</span>
-                      </Button>
+                      {isCompleted ? (
+                        <div className="flex items-center justify-center rounded-full w-8 h-8 bg-primary text-primary-foreground">
+                          <Check className="h-4 w-4" />
+                        </div>
+                      ) : (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => showVerification(habit)}
+                          className="text-xs"
+                        >
+                          Verify
+                        </Button>
+                      )}
                     </div>
                     
                     <div className="text-sm text-muted-foreground">
@@ -271,6 +304,37 @@ export function HabitTracker() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Verification Dialog */}
+      <Dialog open={!!verifyingHabit} onOpenChange={() => setVerifyingHabit(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Verify Habit Completion</DialogTitle>
+            <DialogDescription>
+              {verifyingHabit?.verificationText}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="flex items-center p-4 bg-secondary/50 rounded-md">
+              <div className="mr-3">
+                {verifyingHabit && React.createElement(verifyingHabit.icon, { className: "h-6 w-6 text-primary" })}
+              </div>
+              <div>
+                <p className="font-medium">{verifyingHabit?.name}</p>
+                <p className="text-sm text-muted-foreground">{verifyingHabit?.impact}</p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setVerifyingHabit(null)}>
+              Cancel
+            </Button>
+            <Button onClick={completeHabit}>
+              Confirm Completion
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
