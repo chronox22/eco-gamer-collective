@@ -1,12 +1,22 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Check, Bike, Coffee, DropletIcon, Recycle, Lightbulb } from 'lucide-react';
+import { Check, Bike, Coffee, DropletIcon, Recycle, Lightbulb, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { ProgressRing } from '@/components/ui/ProgressRing';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface Habit {
   id: string;
@@ -58,6 +68,8 @@ export function HabitTracker() {
 
   // Track completed habits
   const [completed, setCompleted] = useState<Record<string, boolean>>({});
+  const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+  const { toast } = useToast();
 
   // Load from localStorage on component mount
   useEffect(() => {
@@ -71,6 +83,15 @@ export function HabitTracker() {
         // Only use stored data if it's from today
         if (date === today) {
           setCompleted(storedCompleted);
+          
+          // Check if all habits are completed
+          const allCompleted = Object.values(storedCompleted).every(Boolean) && 
+                             Object.keys(storedCompleted).length === 5;
+          
+          if (allCompleted) {
+            // If loading completed data, don't show dialog immediately
+            // This prevents showing the dialog every time the page loads
+          }
         } else {
           // Reset for a new day
           initializeHabits();
@@ -104,6 +125,15 @@ export function HabitTracker() {
     
     setCompleted(newCompleted);
     saveToLocalStorage(newCompleted);
+    
+    // Check if all habits are completed after toggling
+    const allCompleted = Object.values(newCompleted).every(Boolean) && 
+                       Object.keys(newCompleted).length === 5;
+    
+    if (allCompleted) {
+      // Show the congratulatory dialog
+      setShowCompletionDialog(true);
+    }
   };
 
   // Save current state to localStorage
@@ -113,6 +143,15 @@ export function HabitTracker() {
       date: today,
       completed: completedState
     }));
+  };
+
+  // Handle dialog close
+  const handleDialogClose = () => {
+    setShowCompletionDialog(false);
+    toast({
+      title: "Great work!",
+      description: "Keep up the good habits tomorrow!",
+    });
   };
 
   // Calculate progress (always 5 total habits)
@@ -201,6 +240,37 @@ export function HabitTracker() {
           <p>You've completed {progress}% of your habits today.</p>
         )}
       </div>
+
+      {/* Congratulatory Dialog */}
+      <AlertDialog open={showCompletionDialog} onOpenChange={setShowCompletionDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center text-2xl flex items-center justify-center gap-2">
+              <Award className="h-6 w-6 text-yellow-500" />
+              Congratulations!
+              <Award className="h-6 w-6 text-yellow-500" />
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              <p className="text-lg mt-2">You have completed all your daily habits!</p>
+              <div className="mt-4 py-2 bg-primary/10 rounded-md text-primary">
+                <p className="font-medium">Environmental Impact Today:</p>
+                <ul className="mt-2 text-sm space-y-1 text-left pl-4">
+                  <li>• Saved 3.6kg of CO2 by biking</li>
+                  <li>• Avoided 9g of plastic waste</li>
+                  <li>• Reduced 2.1kg of CO2 by cold showering</li>
+                  <li>• Diverted 1.8kg of waste from landfill</li>
+                  <li>• Saved 1.4kg of CO2 through energy conservation</li>
+                </ul>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleDialogClose} className="w-full">
+              Keep it up!
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }
