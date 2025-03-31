@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Check, Bike, Coffee, DropletIcon, Recycle, Lightbulb, Award } from 'lucide-react';
+import { Check, Bike, Coffee, DropletIcon, Recycle, Lightbulb, Award, Upload, Image } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { ProgressRing } from '@/components/ui/ProgressRing';
+import { Input } from '@/components/ui/input';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,7 +36,6 @@ interface Habit {
 }
 
 export function HabitTracker() {
-  // Exactly 5 habits with detailed descriptions and verification text
   const habits: Habit[] = [
     { 
       id: 'biking', 
@@ -79,13 +79,14 @@ export function HabitTracker() {
     },
   ];
 
-  // Track completed habits
   const [completed, setCompleted] = useState<Record<string, boolean>>({});
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [verifyingHabit, setVerifyingHabit] = useState<Habit | null>(null);
+  const [verificationImage, setVerificationImage] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  // Load from localStorage on component mount
   useEffect(() => {
     const today = new Date().toDateString();
     const storedData = localStorage.getItem('habitTrackerData');
@@ -94,20 +95,15 @@ export function HabitTracker() {
       try {
         const { date, completed: storedCompleted } = JSON.parse(storedData);
         
-        // Only use stored data if it's from today
         if (date === today) {
           setCompleted(storedCompleted);
           
-          // Check if all habits are completed
           const allCompleted = Object.values(storedCompleted).every(Boolean) && 
                              Object.keys(storedCompleted).length === 5;
           
           if (allCompleted) {
-            // If loading completed data, don't show dialog immediately
-            // This prevents showing the dialog every time the page loads
           }
         } else {
-          // Reset for a new day
           initializeHabits();
         }
       } catch (error) {
@@ -119,7 +115,6 @@ export function HabitTracker() {
     }
   }, []);
 
-  // Initialize all habits as not completed
   const initializeHabits = () => {
     const initialCompleted: Record<string, boolean> = {};
     habits.forEach(habit => {
@@ -130,12 +125,49 @@ export function HabitTracker() {
     saveToLocalStorage(initialCompleted);
   };
 
-  // Show verification dialog for a habit
   const showVerification = (habit: Habit) => {
     setVerifyingHabit(habit);
   };
 
-  // Complete a habit after verification
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    setIsUploading(true);
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        setVerificationImage(e.target.result as string);
+        setIsUploading(false);
+        
+        toast({
+          title: "Image uploaded",
+          description: "Your verification photo has been uploaded",
+        });
+      }
+    };
+    
+    reader.onerror = () => {
+      setIsUploading(false);
+      toast({
+        title: "Upload failed",
+        description: "There was a problem uploading your image",
+        variant: "destructive",
+      });
+    };
+    
+    reader.readAsDataURL(file);
+  };
+
+  const resetVerificationState = () => {
+    setVerifyingHabit(null);
+    setVerificationImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const completeHabit = () => {
     if (!verifyingHabit) return;
     
@@ -146,25 +178,25 @@ export function HabitTracker() {
     };
     
     setCompleted(newCompleted);
+    
+    console.log(`Verification image for ${verifyingHabit.name}:`, verificationImage);
+    
     saveToLocalStorage(newCompleted);
-    setVerifyingHabit(null);
+    resetVerificationState();
     
     toast({
       title: "Habit verified!",
       description: `You've completed: ${verifyingHabit.name}`,
     });
     
-    // Check if all habits are completed after verification
     const allCompleted = Object.values(newCompleted).every(Boolean) && 
                        Object.keys(newCompleted).length === 5;
     
     if (allCompleted) {
-      // Show the congratulatory dialog
       setShowCompletionDialog(true);
     }
   };
 
-  // Save current state to localStorage
   const saveToLocalStorage = (completedState: Record<string, boolean>) => {
     const today = new Date().toDateString();
     localStorage.setItem('habitTrackerData', JSON.stringify({
@@ -173,7 +205,6 @@ export function HabitTracker() {
     }));
   };
 
-  // Handle dialog close
   const handleDialogClose = () => {
     setShowCompletionDialog(false);
     toast({
@@ -182,7 +213,6 @@ export function HabitTracker() {
     });
   };
 
-  // Calculate progress (always 5 total habits)
   const completedCount = Object.values(completed).filter(Boolean).length;
   const totalHabits = 5;
   const progress = Math.round((completedCount / totalHabits) * 100);
@@ -274,7 +304,6 @@ export function HabitTracker() {
         )}
       </div>
 
-      {/* Congratulatory Dialog */}
       <AlertDialog open={showCompletionDialog} onOpenChange={setShowCompletionDialog}>
         <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
@@ -305,8 +334,12 @@ export function HabitTracker() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Verification Dialog */}
-      <Dialog open={!!verifyingHabit} onOpenChange={() => setVerifyingHabit(null)}>
+      <Dialog 
+        open={!!verifyingHabit} 
+        onOpenChange={(open) => {
+          if (!open) resetVerificationState();
+        }}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Verify Habit Completion</DialogTitle>
@@ -314,7 +347,7 @@ export function HabitTracker() {
               {verifyingHabit?.verificationText}
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
+          <div className="py-4 space-y-4">
             <div className="flex items-center p-4 bg-secondary/50 rounded-md">
               <div className="mr-3">
                 {verifyingHabit && React.createElement(verifyingHabit.icon, { className: "h-6 w-6 text-primary" })}
@@ -324,12 +357,75 @@ export function HabitTracker() {
                 <p className="text-sm text-muted-foreground">{verifyingHabit?.impact}</p>
               </div>
             </div>
+            
+            <div className="space-y-3">
+              <p className="text-sm font-medium">Upload verification photo</p>
+              
+              <div className="grid place-items-center border-2 border-dashed border-muted-foreground/25 rounded-md p-4 transition-colors hover:border-primary/50 cursor-pointer relative overflow-hidden"
+                   onClick={() => fileInputRef.current?.click()}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                  ref={fileInputRef}
+                  onChange={handleImageUpload}
+                />
+                
+                {verificationImage ? (
+                  <div className="w-full aspect-video relative">
+                    <img 
+                      src={verificationImage} 
+                      alt="Verification" 
+                      className="w-full h-full object-cover rounded-md"
+                    />
+                    <Button 
+                      variant="secondary" 
+                      size="sm" 
+                      className="absolute bottom-2 right-2 bg-background/80 backdrop-blur-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setVerificationImage(null);
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = '';
+                        }
+                      }}
+                    >
+                      Change
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 py-4">
+                    {isUploading ? (
+                      <div className="text-center">
+                        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
+                        <p className="text-sm text-muted-foreground">Uploading...</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Upload className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="text-center">
+                          <p className="font-medium text-sm">Click to upload</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Upload a photo as evidence of your habit completion
+                          </p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setVerifyingHabit(null)}>
+            <Button variant="outline" onClick={resetVerificationState}>
               Cancel
             </Button>
-            <Button onClick={completeHabit}>
+            <Button 
+              onClick={completeHabit}
+              disabled={isUploading}
+            >
               Confirm Completion
             </Button>
           </DialogFooter>
