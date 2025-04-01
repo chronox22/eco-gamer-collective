@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -20,8 +19,8 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
+import { cn } from '@/lib/utils';
 
-// Reward categories and their items
 const rewardOptions = {
   eWallet: [
     { name: "GCash", points: 100, icon: Wallet },
@@ -67,7 +66,6 @@ export function Rewards() {
   const handleConfirmRedeem = () => {
     setIsDialogOpen(false);
     
-    // Find the selected reward to get its points
     const selectedRewardObj = rewardOptions[selectedCategory].find(r => r.name === selectedReward);
     
     toast.success(
@@ -81,7 +79,6 @@ export function Rewards() {
       }
     );
     
-    // Reset selections
     setSelectedReward('');
     setSelectedDenomination('');
   };
@@ -121,7 +118,6 @@ export function Rewards() {
           </TabsTrigger>
         </TabsList>
         
-        {/* E-Wallet Tab */}
         <TabsContent value="eWallet" className="mt-6 space-y-4">
           <Card>
             <CardHeader>
@@ -188,7 +184,6 @@ export function Rewards() {
           </Card>
         </TabsContent>
         
-        {/* Vouchers Tab */}
         <TabsContent value="vouchers" className="mt-6 space-y-4">
           <Card>
             <CardHeader>
@@ -255,7 +250,6 @@ export function Rewards() {
           </Card>
         </TabsContent>
         
-        {/* Load Tab */}
         <TabsContent value="load" className="mt-6 space-y-4">
           <Card>
             <CardHeader>
@@ -323,7 +317,6 @@ export function Rewards() {
         </TabsContent>
       </Tabs>
       
-      {/* Confirmation Dialog */}
       <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
