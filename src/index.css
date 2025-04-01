@@ -171,3 +171,19 @@
   transform: translateY(10px);
   transition: opacity 300ms, transform 300ms;
 }
+
+/* Toast slide out animation */
+.toast-slide-out {
+  animation: slide-out 0.3s forwards;
+}
+
+@keyframes slide-out {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}

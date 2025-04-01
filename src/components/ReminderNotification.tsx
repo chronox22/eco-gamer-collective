@@ -40,10 +40,18 @@ export function ReminderNotification() {
           duration: 5000,
           className: "animate-scale-in p-4 bg-background/90 backdrop-blur-md border border-border/50 shadow-lg",
           position: "top-center",
+          dismissible: true,
+          closeButton: true,
           style: {
             width: "auto",
             maxWidth: "90%",
             borderRadius: "16px"
+          },
+          // Add animation for closing
+          dismissClassNames: {
+            entered: "animate-scale-in",
+            exiting: "animate-scale-out",
+            exited: "animate-scale-out"
           }
         }
       );
