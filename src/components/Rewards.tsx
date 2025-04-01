@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,23 +29,38 @@ const rewardOptions = {
     { name: "PayPal", points: 150, icon: CreditCard }
   ],
   vouchers: [
-    { name: "Shopee", points: 80, icon: ShoppingBag },
-    { name: "Lazada", points: 80, icon: ShoppingBag },
-    { name: "Move It", points: 70, icon: Tag }
+    { name: "Shopee", points: 80, icon: ShoppingBag, discount: "10% cashback on purchases" },
+    { name: "Lazada", points: 80, icon: ShoppingBag, discount: "₱100 off on min. ₱500 purchase" },
+    { name: "Move It", points: 70, icon: Tag, discount: "20% discount on your next ride" }
   ],
   load: [
-    { name: "Globe", points: 50, icon: Phone },
-    { name: "Smart", points: 50, icon: Phone },
-    { name: "TM", points: 40, icon: Phone },
-    { name: "TNT", points: 40, icon: Phone },
-    { name: "DITO", points: 45, icon: Phone }
+    { name: "Globe", icon: Phone },
+    { name: "Smart", icon: Phone },
+    { name: "TM", icon: Phone },
+    { name: "TNT", icon: Phone },
+    { name: "DITO", icon: Phone }
   ]
 };
 
 const denominations = {
-  eWallet: ["₱50", "₱100", "₱200", "₱500"],
-  vouchers: ["₱50", "₱100", "₱200", "₱300"],
-  load: ["Regular ₱10", "Regular ₱20", "Regular ₱50", "Regular ₱100"]
+  eWallet: [
+    { amount: "₱50", points: 50 },
+    { amount: "₱100", points: 100 },
+    { amount: "₱200", points: 200 },
+    { amount: "₱500", points: 500 }
+  ],
+  vouchers: [
+    { amount: "₱50", points: 50 },
+    { amount: "₱100", points: 100 },
+    { amount: "₱200", points: 200 },
+    { amount: "₱300", points: 300 }
+  ],
+  load: [
+    { amount: "Regular ₱10", points: 10 },
+    { amount: "Regular ₱20", points: 20 },
+    { amount: "Regular ₱50", points: 50 },
+    { amount: "Regular ₱100", points: 100 }
+  ]
 };
 
 export function Rewards() {
@@ -66,18 +82,38 @@ export function Rewards() {
   const handleConfirmRedeem = () => {
     setIsDialogOpen(false);
     
-    const selectedRewardObj = rewardOptions[selectedCategory].find(r => r.name === selectedReward);
+    let selectedRewardObj;
+    let selectedDenominationObj;
     
-    toast.success(
-      <div className="flex flex-col">
-        <span className="font-semibold">Reward Redeemed!</span>
-        <span className="text-sm">{selectedReward} {selectedDenomination} has been redeemed for {selectedRewardObj?.points} eco-points</span>
-      </div>,
-      {
-        duration: 5000,
-        className: "animate-scale-in p-4 bg-background/90 backdrop-blur-md border border-border/50 shadow-lg",
-      }
-    );
+    if (selectedCategory === 'load') {
+      selectedRewardObj = rewardOptions[selectedCategory].find(r => r.name === selectedReward);
+      selectedDenominationObj = denominations[selectedCategory].find(d => d.amount === selectedDenomination);
+      
+      toast.success(
+        <div className="flex flex-col">
+          <span className="font-semibold">Reward Redeemed!</span>
+          <span className="text-sm">{selectedReward} {selectedDenomination} has been redeemed for {selectedDenominationObj?.points} eco-points</span>
+        </div>,
+        {
+          duration: 5000,
+          className: "animate-scale-in p-4 bg-background/90 backdrop-blur-md border border-border/50 shadow-lg",
+        }
+      );
+    } else {
+      selectedRewardObj = rewardOptions[selectedCategory].find(r => r.name === selectedReward);
+      selectedDenominationObj = denominations[selectedCategory].find(d => d.amount === selectedDenomination);
+      
+      toast.success(
+        <div className="flex flex-col">
+          <span className="font-semibold">Reward Redeemed!</span>
+          <span className="text-sm">{selectedReward} {selectedDenomination} has been redeemed for {selectedRewardObj?.points} eco-points</span>
+        </div>,
+        {
+          duration: 5000,
+          className: "animate-scale-in p-4 bg-background/90 backdrop-blur-md border border-border/50 shadow-lg",
+        }
+      );
+    }
     
     setSelectedReward('');
     setSelectedDenomination('');
@@ -163,9 +199,11 @@ export function Rewards() {
                   <SelectValue placeholder="Select amount" />
                 </SelectTrigger>
                 <SelectContent>
-                  {denominations.eWallet.map((amount) => (
-                    <SelectItem key={amount} value={amount}>
-                      {amount}
+                  {denominations.eWallet.map((item) => (
+                    <SelectItem key={item.amount} value={item.amount}>
+                      <span className="flex items-center justify-between w-full">
+                        {item.amount} <Badge variant="outline" className="ml-2">{item.points} points</Badge>
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -205,12 +243,15 @@ export function Rewards() {
                     )}
                   >
                     <RadioGroupItem value={voucher.name} id={voucher.name} />
-                    <Label htmlFor={voucher.name} className="flex-1 cursor-pointer flex items-center justify-between">
-                      <div className="flex items-center">
-                        <voucher.icon className="h-5 w-5 mr-2 text-primary" />
-                        {voucher.name}
+                    <Label htmlFor={voucher.name} className="flex-1 cursor-pointer">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <voucher.icon className="h-5 w-5 mr-2 text-primary" />
+                          {voucher.name}
+                        </div>
+                        <Badge variant="outline">{voucher.points} points</Badge>
                       </div>
-                      <Badge variant="outline">{voucher.points} points</Badge>
+                      <p className="text-xs text-muted-foreground mt-1">{voucher.discount}</p>
                     </Label>
                   </div>
                 ))}
@@ -229,9 +270,11 @@ export function Rewards() {
                   <SelectValue placeholder="Select amount" />
                 </SelectTrigger>
                 <SelectContent>
-                  {denominations.vouchers.map((amount) => (
-                    <SelectItem key={amount} value={amount}>
-                      {amount}
+                  {denominations.vouchers.map((item) => (
+                    <SelectItem key={item.amount} value={item.amount}>
+                      <span className="flex items-center justify-between w-full">
+                        {item.amount} <Badge variant="outline" className="ml-2">{item.points} points</Badge>
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -276,7 +319,6 @@ export function Rewards() {
                         <network.icon className="h-5 w-5 mr-2 text-primary" />
                         {network.name}
                       </div>
-                      <Badge variant="outline">{network.points} points</Badge>
                     </Label>
                   </div>
                 ))}
@@ -295,9 +337,11 @@ export function Rewards() {
                   <SelectValue placeholder="Select amount" />
                 </SelectTrigger>
                 <SelectContent>
-                  {denominations.load.map((amount) => (
-                    <SelectItem key={amount} value={amount}>
-                      {amount}
+                  {denominations.load.map((item) => (
+                    <SelectItem key={item.amount} value={item.amount}>
+                      <span className="flex items-center justify-between w-full">
+                        {item.amount} <Badge variant="outline" className="ml-2">{item.points} points</Badge>
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -329,7 +373,16 @@ export function Rewards() {
                   <p className="font-medium">Redemption Details:</p>
                   <p className="text-sm">
                     Reward: {selectedReward} {selectedDenomination}<br />
-                    Points Required: {rewardOptions[selectedCategory].find(r => r.name === selectedReward)?.points}
+                    {selectedCategory === 'load' ? 
+                      `Points Required: ${denominations.load.find(d => d.amount === selectedDenomination)?.points || 0}` : 
+                      `Points Required: ${rewardOptions[selectedCategory].find(r => r.name === selectedReward)?.points || 0}`
+                    }
+                    {selectedCategory === 'vouchers' && selectedReward && (
+                      <>
+                        <br />
+                        Benefit: {rewardOptions.vouchers.find(v => v.name === selectedReward)?.discount}
+                      </>
+                    )}
                   </p>
                 </div>
               )}

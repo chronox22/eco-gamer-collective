@@ -46,12 +46,6 @@ export function ReminderNotification() {
             width: "auto",
             maxWidth: "90%",
             borderRadius: "16px"
-          },
-          // Add animation for closing
-          dismissClassNames: {
-            entered: "animate-scale-in",
-            exiting: "animate-scale-out",
-            exited: "animate-scale-out"
           }
         }
       );
