@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ProgressRing } from './ui/ProgressRing';
+import { useNavigate } from 'react-router-dom';
 import { 
   Award, 
   Leaf, 
@@ -16,7 +16,8 @@ import {
   Bike, 
   DropletIcon,
   MessageSquare,
-  Info
+  Info,
+  Gift
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
@@ -78,6 +79,7 @@ function AchievementItem({
 export function Profile() {
   const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [creditsDialogOpen, setCreditsDialogOpen] = useState(false);
+  const navigate = useNavigate();
   
   return (
     <section className="space-y-6 animate-fade-in">
@@ -89,7 +91,7 @@ export function Profile() {
       
       <div className="text-center">
         <Avatar className="h-24 w-24 mx-auto">
-        <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="User" />
+          <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="User" />
           <AvatarFallback>AM</AvatarFallback>
         </Avatar>
         <h1 className="text-2xl font-medium mt-4">User</h1>
@@ -98,6 +100,15 @@ export function Profile() {
           <Badge variant="outline" className="bg-primary/10 text-primary">Level 4</Badge>
           <Badge variant="outline">999 points</Badge>
         </div>
+        
+        <Button 
+          onClick={() => navigate('/rewards')} 
+          className="mt-4 animate-pulse hover:animate-none"
+          variant="default"
+        >
+          <Gift className="mr-2 h-4 w-4" />
+          Redeem Your Rewards
+        </Button>
       </div>
       
       <div className="grid grid-cols-3 gap-4 mt-6">
@@ -227,7 +238,6 @@ export function Profile() {
         </TabsContent>
       </Tabs>
       
-      {/* Feedback Dialog */}
       <Dialog open={feedbackDialogOpen} onOpenChange={setFeedbackDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -246,7 +256,6 @@ export function Profile() {
         </DialogContent>
       </Dialog>
       
-      {/* Credits Dialog */}
       <Dialog open={creditsDialogOpen} onOpenChange={setCreditsDialogOpen}>
         <DialogContent>
           <DialogHeader>
