@@ -34,6 +34,7 @@ interface Habit {
   description: string;
   impact: string;
   verificationText: string;
+  points: number;
 }
 
 export function HabitTracker() {
@@ -44,7 +45,8 @@ export function HabitTracker() {
       icon: Bike,
       description: 'Use a bike instead of a car for your commute',
       impact: 'Saves 3.6kg of CO2 emissions',
-      verificationText: 'Confirm that you commuted to work using a bicycle today'
+      verificationText: 'Confirm that you commuted to work using a bicycle today',
+      points: 30
     },
     { 
       id: 'reusable', 
@@ -52,7 +54,8 @@ export function HabitTracker() {
       icon: Coffee,
       description: 'Bring your own cup for coffee or drinks',
       impact: 'Saves 9g of plastic waste',
-      verificationText: 'Confirm that you used a reusable cup for your beverages today'
+      verificationText: 'Confirm that you used a reusable cup for your beverages today',
+      points: 10
     },
     { 
       id: 'water', 
@@ -60,7 +63,8 @@ export function HabitTracker() {
       icon: DropletIcon,
       description: 'Reduce hot water usage by taking a cold shower',
       impact: 'Saves 2.1kg of CO2 emissions',
-      verificationText: 'Confirm that you took a cold shower to save energy'
+      verificationText: 'Confirm that you took a cold shower to save energy',
+      points: 20
     },
     { 
       id: 'recycle', 
@@ -68,7 +72,8 @@ export function HabitTracker() {
       icon: Recycle,
       description: 'Properly sort and recycle all eligible waste',
       impact: 'Saves 1.8kg of landfill waste',
-      verificationText: 'Confirm that you properly sorted and recycled your waste today'
+      verificationText: 'Confirm that you properly sorted and recycled your waste today',
+      points: 15
     },
     { 
       id: 'energy', 
@@ -76,7 +81,8 @@ export function HabitTracker() {
       icon: Lightbulb,
       description: 'Turn off lights and appliances when not in use',
       impact: 'Saves 1.4kg of CO2 emissions',
-      verificationText: 'Confirm that you turned off lights and unplugged unused appliances'
+      verificationText: 'Confirm that you turned off lights and unplugged unused appliances',
+      points: 20
     },
   ];
 
@@ -208,7 +214,6 @@ export function HabitTracker() {
       console.log(`Verification image for ${verifyingHabit.name}:`, verificationImage);
       
       saveToLocalStorage(newCompleted);
-      resetVerificationState();
       
       toast({
         title: "Habit verified!",
@@ -221,6 +226,12 @@ export function HabitTracker() {
       if (allCompleted) {
         setShowCompletionDialog(true);
       }
+      
+      // Auto-close the dialog after 3 seconds
+      setTimeout(() => {
+        resetVerificationState();
+      }, 3000);
+      
     }, 1500);
   };
 
@@ -287,9 +298,10 @@ export function HabitTracker() {
             <Card 
               key={habit.id}
               className={cn(
-                "border transition-all duration-200 hover:shadow-md", 
+                "border transition-all duration-200 hover:shadow-md cursor-pointer", 
                 isCompleted ? "border-primary bg-primary/10" : ""
               )}
+              onClick={() => !isCompleted && showVerification(habit)}
             >
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
@@ -302,22 +314,13 @@ export function HabitTracker() {
                   
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium">{habit.name}</span>
+                      <span className="font-medium">{habit.name} <span className="text-green-600 ml-1">({habit.points} pts)</span></span>
                       
                       {isCompleted ? (
                         <div className="flex items-center justify-center rounded-full w-8 h-8 bg-primary text-primary-foreground">
                           <Check className="h-4 w-4" />
                         </div>
-                      ) : (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => showVerification(habit)}
-                          className="text-xs"
-                        >
-                          Verify
-                        </Button>
-                      )}
+                      ) : null}
                     </div>
                     
                     <div className="text-sm text-muted-foreground">
@@ -391,7 +394,7 @@ export function HabitTracker() {
                 {verifyingHabit && React.createElement(verifyingHabit.icon, { className: "h-6 w-6 text-primary" })}
               </div>
               <div>
-                <p className="font-medium">{verifyingHabit?.name}</p>
+                <p className="font-medium">{verifyingHabit?.name} <span className="text-green-600 ml-1">({verifyingHabit?.points} pts)</span></p>
                 <p className="text-sm text-muted-foreground">{verifyingHabit?.impact}</p>
               </div>
             </div>
