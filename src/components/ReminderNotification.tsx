@@ -1,6 +1,6 @@
 
-import React, { useEffect, useState } from 'react';
-import { AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogHeader, AlertDialogFooter, AlertDialogAction } from '@/components/ui/alert-dialog';
+import React, { useEffect } from 'react';
+import { toast } from "sonner";
 
 const reminders = [
   "Today is plastic waste collection day! Segregate your trash properly.",
@@ -21,9 +21,6 @@ const reminders = [
 ];
 
 export function ReminderNotification() {
-  const [open, setOpen] = useState(false);
-  const [reminder, setReminder] = useState('');
-
   useEffect(() => {
     // Only show reminder on initial load
     const hasShownReminder = sessionStorage.getItem('hasShownReminder');
@@ -31,29 +28,31 @@ export function ReminderNotification() {
     if (!hasShownReminder) {
       // Get a random reminder
       const randomIndex = Math.floor(Math.random() * reminders.length);
-      setReminder(reminders[randomIndex]);
-      setOpen(true);
+      const reminder = reminders[randomIndex];
+      
+      // Show the dynamic island-style notification
+      toast(
+        <div className="flex flex-col">
+          <span className="font-semibold text-base">Eco Reminder</span>
+          <span className="text-primary font-medium">{reminder}</span>
+        </div>,
+        {
+          duration: 5000,
+          className: "animate-scale-in p-4 bg-background/90 backdrop-blur-md border border-border/50 shadow-lg",
+          position: "top-center",
+          style: {
+            width: "auto",
+            maxWidth: "90%",
+            borderRadius: "16px"
+          }
+        }
+      );
       
       // Mark that we've shown a reminder this session
       sessionStorage.setItem('hasShownReminder', 'true');
     }
   }, []);
 
-  return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogContent className="max-w-md">
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-center">Eco Reminder</AlertDialogTitle>
-          <AlertDialogDescription className="text-center">
-            <p className="text-lg font-medium text-primary">{reminder}</p>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="flex justify-center">
-          <AlertDialogAction onClick={() => setOpen(false)} className="w-full sm:w-auto">
-            Got it!
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
+  // This component doesn't render anything directly, it just triggers the toast
+  return null;
 }
