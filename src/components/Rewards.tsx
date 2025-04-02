@@ -44,10 +44,10 @@ const rewardOptions = {
 
 const denominations = {
   eWallet: [
-    { amount: "₱50", points: 50 },
-    { amount: "₱100", points: 100 },
-    { amount: "₱200", points: 200 },
-    { amount: "₱500", points: 500 }
+    { amount: "₱50"},
+    { amount: "₱100"},
+    { amount: "₱200"},
+    { amount: "₱500"}
   ],
   vouchers: [
     { amount: "₱50", points: 50 },
