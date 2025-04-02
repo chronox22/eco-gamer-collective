@@ -24,9 +24,9 @@ import { cn } from '@/lib/utils';
 
 const rewardOptions = {
   eWallet: [
-    { name: "GCash", points: 100, icon: Wallet },
-    { name: "PayMaya", points: 100, icon: Wallet },
-    { name: "PayPal", points: 150, icon: CreditCard }
+    { name: "GCash", icon: Wallet },
+    { name: "PayMaya", icon: Wallet },
+    { name: "PayPal", icon: CreditCard }
   ],
   vouchers: [
     { name: "Shopee", points: 80, icon: ShoppingBag, discount: "10% cashback on purchases" },
