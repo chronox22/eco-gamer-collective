@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,11 +17,14 @@ import {
   DropletIcon,
   MessageSquare,
   Info,
-  Gift
+  Gift,
+  Moon,
+  Sun
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Switch } from '@/components/ui/switch';
 
 interface AchievementItemProps {
   title: string;
@@ -79,12 +82,46 @@ function AchievementItem({
 export function Profile() {
   const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [creditsDialogOpen, setCreditsDialogOpen] = useState(false);
+  const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    setDarkMode(isDark);
+    
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+  
+  const toggleDarkMode = () => {
+    setDarkMode(prev => {
+      const newMode = !prev;
+      if (newMode) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+      return newMode;
+    });
+  };
   
   return (
     <section className="space-y-6 animate-fade-in">
       <div className="flex justify-end">
-        <Button variant="ghost" size="icon">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => setSettingsDialogOpen(true)}
+        >
           <Settings className="h-5 w-5" />
         </Button>
       </div>
@@ -237,6 +274,32 @@ export function Profile() {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      <Dialog open={settingsDialogOpen} onOpenChange={setSettingsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Settings</DialogTitle>
+            <DialogDescription>
+              Configure your app preferences
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                {darkMode ? 
+                  <Moon className="h-5 w-5 text-primary" /> : 
+                  <Sun className="h-5 w-5 text-amber-500" />
+                }
+                <span>Dark Mode</span>
+              </div>
+              <Switch 
+                checked={darkMode} 
+                onCheckedChange={toggleDarkMode} 
+              />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       
       <Dialog open={feedbackDialogOpen} onOpenChange={setFeedbackDialogOpen}>
         <DialogContent>
