@@ -45,16 +45,16 @@ const rewardOptions = {
 
 const denominations = {
   eWallet: [
-    { amount: "₱50", points: 500 },
-    { amount: "₱100", points: 1000 },
-    { amount: "₱200", points: 2000 },
-    { amount: "₱500", points: 5000 }
+    { amount: "₱50", points: 20000 },
+    { amount: "₱100", points: 40000 },
+    { amount: "₱200", points: 60000 },
+    { amount: "₱500", points: 120000 }
   ],
   load: [
-    { amount: "Regular ₱10", points: 1000 },
-    { amount: "Regular ₱20", points: 2000 },
-    { amount: "Regular ₱50", points: 5000 },
-    { amount: "Regular ₱100", points: 10000 }
+    { amount: "Regular ₱10", points: 5000 },
+    { amount: "Regular ₱20", points: 10000 },
+    { amount: "Regular ₱50", points: 25000 },
+    { amount: "Regular ₱100", points: 50000 }
   ]
 };
 
