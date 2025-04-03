@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
 import { 
   Wallet, 
@@ -34,32 +34,26 @@ const rewardOptions = {
     { name: "Move It", points: 70, icon: Tag, discount: "20% discount on your next ride" }
   ],
   load: [
-    { name: "Globe", icon: Phone },
-    { name: "Smart", icon: Phone },
-    { name: "TM", icon: Phone },
-    { name: "TNT", icon: Phone },
-    { name: "DITO", icon: Phone }
+    { name: "Globe", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Globe_Telecom_logo.svg/200px-Globe_Telecom_logo.svg.png" },
+    { name: "Smart", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/SMART_Communications_logo.svg/200px-SMART_Communications_logo.svg.png" },
+    { name: "TM", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/en/thumb/a/ac/Touch_Mobile_logo.svg/200px-Touch_Mobile_logo.svg.png" },
+    { name: "TNT", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/en/5/55/Talk_%27N_Text_logo.png" },
+    { name: "DITO", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/DITO_Telecommunity_logo.svg/200px-DITO_Telecommunity_logo.svg.png" }
   ]
 };
 
 const denominations = {
   eWallet: [
-    { amount: "₱50"},
-    { amount: "₱100"},
-    { amount: "₱200"},
-    { amount: "₱500"}
-  ],
-  vouchers: [
-    { amount: "₱50", points: 50 },
-    { amount: "₱100", points: 100 },
-    { amount: "₱200", points: 200 },
-    { amount: "₱300", points: 300 }
+    { amount: "₱50", points: 500 },
+    { amount: "₱100", points: 1000 },
+    { amount: "₱200", points: 2000 },
+    { amount: "₱500", points: 5000 }
   ],
   load: [
-    { amount: "Regular ₱10", points: 10 },
-    { amount: "Regular ₱20", points: 20 },
-    { amount: "Regular ₱50", points: 50 },
-    { amount: "Regular ₱100", points: 100 }
+    { amount: "Regular ₱10", points: 1000 },
+    { amount: "Regular ₱20", points: 2000 },
+    { amount: "Regular ₱50", points: 5000 },
+    { amount: "Regular ₱100", points: 10000 }
   ]
 };
 
@@ -71,8 +65,8 @@ export function Rewards() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   const handleRedeemClick = () => {
-    if (!selectedReward || !selectedDenomination) {
-      toast.error("Please select both a reward and denomination");
+    if (!selectedReward || (selectedCategory !== 'vouchers' && !selectedDenomination)) {
+      toast.error("Please select all required options");
       return;
     }
     
@@ -82,38 +76,28 @@ export function Rewards() {
   const handleConfirmRedeem = () => {
     setIsDialogOpen(false);
     
-    let selectedRewardObj;
-    let selectedDenominationObj;
+    let denominationPoints = 0;
+    let rewardName = selectedReward;
+    let amountText = selectedCategory !== 'vouchers' ? selectedDenomination : '';
     
-    if (selectedCategory === 'load') {
-      selectedRewardObj = rewardOptions[selectedCategory].find(r => r.name === selectedReward);
-      selectedDenominationObj = denominations[selectedCategory].find(d => d.amount === selectedDenomination);
-      
-      toast.success(
-        <div className="flex flex-col">
-          <span className="font-semibold">Reward Redeemed!</span>
-          <span className="text-sm">{selectedReward} {selectedDenomination} has been redeemed for {selectedDenominationObj?.points} eco-points</span>
-        </div>,
-        {
-          duration: 5000,
-          className: "animate-scale-in p-4 bg-background/90 backdrop-blur-md border border-border/50 shadow-lg",
-        }
-      );
+    if (selectedCategory === 'eWallet' || selectedCategory === 'load') {
+      denominationPoints = denominations[selectedCategory].find(d => d.amount === selectedDenomination)?.points || 0;
     } else {
-      selectedRewardObj = rewardOptions[selectedCategory].find(r => r.name === selectedReward);
-      selectedDenominationObj = denominations[selectedCategory].find(d => d.amount === selectedDenomination);
-      
-      toast.success(
-        <div className="flex flex-col">
-          <span className="font-semibold">Reward Redeemed!</span>
-          <span className="text-sm">{selectedReward} {selectedDenomination} has been redeemed for {selectedRewardObj?.points} eco-points</span>
-        </div>,
-        {
-          duration: 5000,
-          className: "animate-scale-in p-4 bg-background/90 backdrop-blur-md border border-border/50 shadow-lg",
-        }
-      );
+      const selectedVoucher = rewardOptions.vouchers.find(v => v.name === selectedReward);
+      denominationPoints = selectedVoucher?.points || 0;
+      amountText = selectedVoucher?.discount || '';
     }
+    
+    toast.success(
+      <div className="flex flex-col">
+        <span className="font-semibold">Reward Redeemed!</span>
+        <span className="text-sm">{rewardName} {amountText} has been redeemed for {denominationPoints} eco-points</span>
+      </div>,
+      {
+        duration: 5000,
+        className: "animate-scale-in p-4 bg-background/90 backdrop-blur-md border border-border/50 shadow-lg",
+      }
+    );
     
     setSelectedReward('');
     setSelectedDenomination('');
@@ -180,7 +164,6 @@ export function Rewards() {
                         <wallet.icon className="h-5 w-5 mr-2 text-primary" />
                         {wallet.name}
                       </div>
-                      <Badge variant="outline">{wallet.points} points</Badge>
                     </Label>
                   </div>
                 ))}
@@ -258,36 +241,13 @@ export function Rewards() {
               </RadioGroup>
             </CardContent>
             
-            <Separator className="my-2" />
-            
-            <CardHeader>
-              <CardTitle>Select Amount</CardTitle>
-              <CardDescription>Choose voucher denomination</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Select value={selectedDenomination} onValueChange={setSelectedDenomination}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select amount" />
-                </SelectTrigger>
-                <SelectContent>
-                  {denominations.vouchers.map((item) => (
-                    <SelectItem key={item.amount} value={item.amount}>
-                      <span className="flex items-center justify-between w-full">
-                        {item.amount} <Badge variant="outline" className="ml-2">{item.points} points</Badge>
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </CardContent>
-            
             <CardFooter>
               <Button 
                 onClick={handleRedeemClick} 
                 className="w-full"
-                disabled={!selectedReward || !selectedDenomination}
+                disabled={!selectedReward}
               >
-                Redeem Reward
+                Redeem Voucher
               </Button>
             </CardFooter>
           </Card>
@@ -316,7 +276,11 @@ export function Rewards() {
                     <RadioGroupItem value={network.name} id={network.name} />
                     <Label htmlFor={network.name} className="flex-1 cursor-pointer flex items-center justify-between">
                       <div className="flex items-center">
-                        <network.icon className="h-5 w-5 mr-2 text-primary" />
+                        <img 
+                          src={network.image} 
+                          alt={network.name} 
+                          className="h-6 w-6 mr-2 object-contain" 
+                        />
                         {network.name}
                       </div>
                     </Label>
@@ -354,7 +318,7 @@ export function Rewards() {
                 className="w-full"
                 disabled={!selectedReward || !selectedDenomination}
               >
-                Redeem Reward
+                Redeem Load
               </Button>
             </CardFooter>
           </Card>
@@ -366,25 +330,35 @@ export function Rewards() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Redemption</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to redeem {selectedReward} {selectedDenomination}?
-              
-              {selectedReward && (
-                <div className="mt-2 p-3 bg-muted rounded-md">
-                  <p className="font-medium">Redemption Details:</p>
-                  <p className="text-sm">
-                    Reward: {selectedReward} {selectedDenomination}<br />
-                    {selectedCategory === 'load' ? 
-                      `Points Required: ${denominations.load.find(d => d.amount === selectedDenomination)?.points || 0}` : 
-                      `Points Required: ${rewardOptions[selectedCategory].find(r => r.name === selectedReward)?.points || 0}`
-                    }
-                    {selectedCategory === 'vouchers' && selectedReward && (
-                      <>
-                        <br />
+              {selectedCategory === 'vouchers' ? (
+                <>
+                  Are you sure you want to redeem {selectedReward} voucher?
+                  
+                  {selectedReward && (
+                    <div className="mt-2 p-3 bg-muted rounded-md">
+                      <p className="font-medium">Redemption Details:</p>
+                      <p className="text-sm">
+                        Reward: {selectedReward}<br />
+                        Points Required: {rewardOptions.vouchers.find(v => v.name === selectedReward)?.points || 0}<br />
                         Benefit: {rewardOptions.vouchers.find(v => v.name === selectedReward)?.discount}
-                      </>
-                    )}
-                  </p>
-                </div>
+                      </p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  Are you sure you want to redeem {selectedReward} {selectedDenomination}?
+                  
+                  {selectedReward && (
+                    <div className="mt-2 p-3 bg-muted rounded-md">
+                      <p className="font-medium">Redemption Details:</p>
+                      <p className="text-sm">
+                        Reward: {selectedReward} {selectedDenomination}<br />
+                        Points Required: {denominations[selectedCategory].find(d => d.amount === selectedDenomination)?.points || 0}
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
