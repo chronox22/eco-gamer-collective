@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -62,12 +63,20 @@ export function Rewards() {
   const [selectedCategory, setSelectedCategory] = useState('eWallet');
   const [selectedReward, setSelectedReward] = useState('');
   const [selectedDenomination, setSelectedDenomination] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   const handleRedeemClick = () => {
-    if (!selectedReward || (selectedCategory !== 'vouchers' && !selectedDenomination)) {
-      toast.error("Please select all required options");
-      return;
+    if (selectedCategory === 'eWallet' || selectedCategory === 'load') {
+      if (!selectedReward || !selectedDenomination || !phoneNumber || phoneNumber.trim() === '') {
+        toast.error("Please fill in all required fields");
+        return;
+      }
+    } else if (selectedCategory === 'vouchers') {
+      if (!selectedReward) {
+        toast.error("Please select a voucher");
+        return;
+      }
     }
     
     setIsDialogOpen(true);
@@ -91,7 +100,12 @@ export function Rewards() {
     toast.success(
       <div className="flex flex-col">
         <span className="font-semibold">Reward Redeemed!</span>
-        <span className="text-sm">{rewardName} {amountText} has been redeemed for {denominationPoints} eco-points</span>
+        <span className="text-sm">
+          {rewardName} {amountText} 
+          {(selectedCategory === 'eWallet' || selectedCategory === 'load') && phoneNumber && 
+            ` for +63${phoneNumber}`} 
+          has been redeemed for {denominationPoints} eco-points
+        </span>
       </div>,
       {
         duration: 5000,
@@ -101,6 +115,15 @@ export function Rewards() {
     
     setSelectedReward('');
     setSelectedDenomination('');
+    setPhoneNumber('');
+  };
+
+  const handlePhoneNumberChange = (e) => {
+    // Only allow digits and limit to 10 digits (excluding the country code)
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 10) {
+      setPhoneNumber(value);
+    }
   };
 
   return (
@@ -170,6 +193,25 @@ export function Rewards() {
               </RadioGroup>
             </CardContent>
             
+            <CardHeader>
+              <CardTitle>Mobile Number</CardTitle>
+              <CardDescription>Enter your mobile number</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center border rounded-md px-3 py-2 bg-muted/50">
+                  <span className="text-sm font-medium">+63</span>
+                </div>
+                <Input
+                  value={phoneNumber}
+                  onChange={handlePhoneNumberChange}
+                  placeholder="9XX XXX XXXX"
+                  className="flex-1"
+                  type="tel"
+                />
+              </div>
+            </CardContent>
+            
             <Separator className="my-2" />
             
             <CardHeader>
@@ -197,7 +239,7 @@ export function Rewards() {
               <Button 
                 onClick={handleRedeemClick} 
                 className="w-full"
-                disabled={!selectedReward || !selectedDenomination}
+                disabled={!selectedReward || !selectedDenomination || !phoneNumber}
               >
                 Redeem Reward
               </Button>
@@ -289,6 +331,25 @@ export function Rewards() {
               </RadioGroup>
             </CardContent>
             
+            <CardHeader>
+              <CardTitle>Mobile Number</CardTitle>
+              <CardDescription>Enter your mobile number</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center border rounded-md px-3 py-2 bg-muted/50">
+                  <span className="text-sm font-medium">+63</span>
+                </div>
+                <Input
+                  value={phoneNumber}
+                  onChange={handlePhoneNumberChange}
+                  placeholder="9XX XXX XXXX"
+                  className="flex-1"
+                  type="tel"
+                />
+              </div>
+            </CardContent>
+            
             <Separator className="my-2" />
             
             <CardHeader>
@@ -316,7 +377,7 @@ export function Rewards() {
               <Button 
                 onClick={handleRedeemClick} 
                 className="w-full"
-                disabled={!selectedReward || !selectedDenomination}
+                disabled={!selectedReward || !selectedDenomination || !phoneNumber}
               >
                 Redeem Load
               </Button>
@@ -347,13 +408,14 @@ export function Rewards() {
                 </>
               ) : (
                 <>
-                  Are you sure you want to redeem {selectedReward} {selectedDenomination}?
+                  Are you sure you want to redeem {selectedReward} {selectedDenomination} for +63{phoneNumber}?
                   
                   {selectedReward && (
                     <div className="mt-2 p-3 bg-muted rounded-md">
                       <p className="font-medium">Redemption Details:</p>
                       <p className="text-sm">
                         Reward: {selectedReward} {selectedDenomination}<br />
+                        Mobile Number: +63{phoneNumber}<br />
                         Points Required: {denominations[selectedCategory].find(d => d.amount === selectedDenomination)?.points || 0}
                       </p>
                     </div>
