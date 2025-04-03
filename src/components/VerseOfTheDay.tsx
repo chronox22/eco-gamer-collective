@@ -114,22 +114,22 @@ export function VerseOfTheDay() {
   if (!verseOfDay) return null;
   
   return (
-    <Card className="mb-6 border-blue-100 bg-blue-50/50">
+    <Card className="mb-6 border-blue-100 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/30">
       <CardContent className="p-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200">
+            <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100 hover:bg-blue-200 dark:hover:bg-blue-700">
               Verse of the Day
             </Badge>
           </div>
           <div className="space-y-1">
-            <h3 className="font-medium text-lg text-blue-800">{verseOfDay.verse}</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-medium text-lg text-blue-800 dark:text-blue-300">{verseOfDay.verse}</h3>
+            <p className="text-sm text-muted-foreground dark:text-gray-300">
               "{verseOfDay.text}"
             </p>
             <div className="flex items-center mt-2">
-              <BookOpen className="h-3 w-3 mr-1 text-blue-500" />
-              <span className="text-xs text-blue-500">Holy Bible</span>
+              <BookOpen className="h-3 w-3 mr-1 text-blue-500 dark:text-blue-400" />
+              <span className="text-xs text-blue-500 dark:text-blue-400">Holy Bible</span>
             </div>
           </div>
         </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
@@ -112,17 +113,17 @@ export function WordOfTheDay() {
   if (!wordOfDay) return null;
   
   return (
-    <Card className="mb-6 border-green-100 bg-green-50/50">
+    <Card className="mb-6 border-green-100 dark:border-green-900 bg-green-50/50 dark:bg-green-950/30">
       <CardContent className="p-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200">
+            <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 hover:bg-green-200 dark:hover:bg-green-700">
               Word of the Day
             </Badge>
           </div>
           <div className="space-y-1">
-            <h3 className="font-medium text-lg text-green-800">{wordOfDay.word}</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-medium text-lg text-green-800 dark:text-green-300">{wordOfDay.word}</h3>
+            <p className="text-sm text-muted-foreground dark:text-gray-300">
               {wordOfDay.definition}
             </p>
           </div>
