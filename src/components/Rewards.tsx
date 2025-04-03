@@ -35,11 +35,11 @@ const rewardOptions = {
     { name: "Move It", points: 70, icon: Tag, discount: "20% discount on your next ride" }
   ],
   load: [
-    { name: "Globe", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Globe_Telecom_logo.svg/200px-Globe_Telecom_logo.svg.png" },
-    { name: "Smart", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/SMART_Communications_logo.svg/200px-SMART_Communications_logo.svg.png" },
-    { name: "TM", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/en/thumb/a/ac/Touch_Mobile_logo.svg/200px-Touch_Mobile_logo.svg.png" },
-    { name: "TNT", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/en/5/55/Talk_%27N_Text_logo.png" },
-    { name: "DITO", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/DITO_Telecommunity_logo.svg/200px-DITO_Telecommunity_logo.svg.png" }
+    { name: "Globe", icon: Phone, image: "https://e7.pngegg.com/pngimages/66/112/png-clipart-globe-telecom-other-telecommunications-cebu-mobile-phones-globe-telecoms-logo-globe-text-thumbnail.png" },
+    { name: "Smart", icon: Phone, image: "https://download.logo.wine/logo/Smart_Communications/Smart_Communications-Logo.wine.png" },
+    { name: "TM", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/commons/6/68/TM_Logo_%282019_-_Present%29.png" },
+    { name: "TNT", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/commons/3/36/TNT_%28cellular_service%29_logo.png" },
+    { name: "DITO", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/commons/5/5d/DITO_Telecommunity_logo.jpg" }
   ]
 };
 
