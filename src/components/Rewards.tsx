@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
@@ -8,6 +7,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { Database } from '@/integrations/supabase/types';
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const rewardsCategories = [
   { name: 'Featured', icon: Award },
@@ -145,7 +147,6 @@ export function Rewards() {
         </div>
       </div>
       
-      {/* Categories */}
       <div className="overflow-x-auto pb-2">
         <div className="flex space-x-2 min-w-max">
           {rewardsCategories.map((category) => {
@@ -167,7 +168,6 @@ export function Rewards() {
         </div>
       </div>
       
-      {/* Rewards Grid */}
       <div className="grid grid-cols-2 gap-4">
         {filteredRewards.map((reward) => (
           <Card 
@@ -197,7 +197,6 @@ export function Rewards() {
         ))}
       </div>
       
-      {/* Reward Detail Dialog */}
       {selectedReward && (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="sm:max-w-md">
@@ -259,7 +258,6 @@ export function Rewards() {
         </Dialog>
       )}
       
-      {/* Confirmation Dialog */}
       {selectedReward && (
         <Dialog open={isConfirmationOpen} onOpenChange={setIsConfirmationOpen}>
           <DialogContent className="sm:max-w-md text-center">
