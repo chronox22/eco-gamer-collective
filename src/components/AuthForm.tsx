@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Leaf, Mail, Lock, User } from 'lucide-react';
+import { Leaf, Mail, Lock, User, Sun, ArrowRight } from 'lucide-react';
 
 export function AuthForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -73,29 +73,33 @@ export function AuthForm() {
   };
 
   return (
-    <Card className="w-full max-w-md glass-card overflow-hidden animate-scale-in">
+    <Card className="w-full max-w-md glass-card overflow-hidden animate-float-card shadow-xl border-white/20">
+      {/* Animated card background */}
       <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-primary/10 blur-3xl"></div>
       <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-accent/10 blur-3xl"></div>
       
-      <CardHeader className="space-y-2 text-center relative">
-        <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-          <Leaf className="h-6 w-6 text-primary animate-pulse-slow" />
+      <div className="absolute inset-0 bg-black/5 backdrop-blur-sm z-0"></div>
+      
+      <CardHeader className="space-y-2 text-center relative z-10">
+        <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center mb-2 shadow-lg animate-pulse-slow">
+          <Sun className="h-8 w-8 text-white animate-spin-slow" />
+          <Leaf className="h-6 w-6 text-white absolute animate-float-medium" />
         </div>
-        <CardTitle className="text-2xl">{isSignUp ? 'Create Account' : 'Welcome Back'}</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-2xl text-white">{isSignUp ? 'Create Account' : 'Welcome Back'}</CardTitle>
+        <CardDescription className="text-white/80">
           {isSignUp
-            ? 'Sign up to start your eco-friendly journey'
-            : 'Sign in to continue your impact on the environment'}
+            ? 'Join our eco-friendly community'
+            : 'Continue your sustainable journey'}
         </CardDescription>
       </CardHeader>
       
-      <CardContent>
+      <CardContent className="relative z-10">
         <form onSubmit={handleSubmit} className="space-y-4">
           {isSignUp && (
             <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name</Label>
+              <Label htmlFor="fullName" className="text-white">Full Name</Label>
               <div className="relative">
-                <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <User className="absolute left-3 top-2.5 h-4 w-4 text-white/70" />
                 <Input
                   id="fullName"
                   name="fullName"
@@ -103,16 +107,16 @@ export function AuthForm() {
                   required={isSignUp}
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="pl-10"
+                  className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-green-400 transition-all"
                 />
               </div>
             </div>
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-white">Email</Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-white/70" />
               <Input
                 id="email"
                 name="email"
@@ -121,15 +125,15 @@ export function AuthForm() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="pl-10"
+                className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-green-400 transition-all"
               />
             </div>
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-white">Password</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-white/70" />
               <Input
                 id="password"
                 name="password"
@@ -138,28 +142,35 @@ export function AuthForm() {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="pl-10"
+                className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-green-400 transition-all"
               />
             </div>
           </div>
           
-          <Button type="submit" className="w-full mt-6" disabled={isLoading}>
+          <Button 
+            type="submit" 
+            className="w-full mt-6 bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white border-none flex items-center justify-center gap-2 group transition-all duration-300" 
+            disabled={isLoading}
+          >
             {isLoading ? (
               <div className="flex items-center justify-center">
                 <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin mr-2"></div>
                 {isSignUp ? 'Creating Account...' : 'Signing In...'}
               </div>
             ) : (
-              <>{isSignUp ? 'Sign Up' : 'Sign In'}</>
+              <>
+                <span>{isSignUp ? 'Sign Up' : 'Sign In'}</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </>
             )}
           </Button>
         </form>
       </CardContent>
       
-      <CardFooter className="flex flex-col space-y-4">
-        <div className="text-center text-sm">
+      <CardFooter className="flex flex-col space-y-4 relative z-10">
+        <div className="text-center text-sm text-white/90">
           {isSignUp ? 'Already have an account?' : "Don't have an account yet?"}
-          <Button variant="link" className="p-0 h-auto ml-1" onClick={toggleAuthMode}>
+          <Button variant="link" className="p-0 h-auto ml-1 text-green-300 hover:text-green-200" onClick={toggleAuthMode}>
             {isSignUp ? 'Sign In' : 'Sign Up'}
           </Button>
         </div>
