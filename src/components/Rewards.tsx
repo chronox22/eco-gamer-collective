@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 import { cn } from '@/lib/utils';
+import { getUserPoints, setUserPoints } from './Profile';
 
 const rewardOptions = {
   eWallet: [
@@ -65,6 +66,12 @@ export function Rewards() {
   const [selectedDenomination, setSelectedDenomination] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [availablePoints, setAvailablePoints] = useState(getUserPoints());
+  
+  // Update points display when component mounts or when points change in localStorage
+  useEffect(() => {
+    setAvailablePoints(getUserPoints());
+  }, []);
   
   const handleRedeemClick = () => {
     if (selectedCategory === 'eWallet' || selectedCategory === 'load') {
@@ -72,9 +79,24 @@ export function Rewards() {
         toast.error("Please fill in all required fields");
         return;
       }
+      
+      // Check if user has enough points
+      const requiredPoints = denominations[selectedCategory].find(d => d.amount === selectedDenomination)?.points || 0;
+      if (availablePoints < requiredPoints) {
+        toast.error("You don't have enough points for this reward");
+        return;
+      }
     } else if (selectedCategory === 'vouchers') {
       if (!selectedReward) {
         toast.error("Please select a voucher");
+        return;
+      }
+      
+      // Check if user has enough points for voucher
+      const selectedVoucher = rewardOptions.vouchers.find(v => v.name === selectedReward);
+      const requiredPoints = selectedVoucher?.points || 0;
+      if (availablePoints < requiredPoints) {
+        toast.error("You don't have enough points for this voucher");
         return;
       }
     }
@@ -96,6 +118,11 @@ export function Rewards() {
       denominationPoints = selectedVoucher?.points || 0;
       amountText = selectedVoucher?.discount || '';
     }
+    
+    // Deduct points from user's account
+    const newPoints = availablePoints - denominationPoints;
+    setUserPoints(newPoints);
+    setAvailablePoints(newPoints);
     
     toast.success(
       <div className="flex flex-col">
@@ -134,7 +161,7 @@ export function Rewards() {
           Back to Profile
         </Button>
         <Badge variant="outline" className="bg-primary/10 text-primary">
-          Available: 999 Eco-Points
+          Available: {availablePoints.toLocaleString()} Eco-Points
         </Badge>
       </div>
       
