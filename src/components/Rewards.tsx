@@ -1,462 +1,290 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from "@/components/ui/badge";
-import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Separator } from "@/components/ui/separator";
-import { 
-  Wallet, 
-  CreditCard, 
-  ShoppingBag, 
-  Phone, 
-  Tag,
-  ArrowLeft
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from "sonner";
-import { cn } from '@/lib/utils';
-import { getUserPoints, setUserPoints } from './Profile';
+import React, { useState } from 'react';
+import { Button } from './ui/button';
+import { Card, CardContent } from './ui/card';
+import { Badge } from './ui/badge';
+import { GiftIcon, ShoppingCart, Award, Coins, Coffee, Pizza, User, Home, Bike, Smartphone } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
-const rewardOptions = {
-  eWallet: [
-    { name: "GCash", icon: Wallet },
-    { name: "PayMaya", icon: Wallet },
-    { name: "PayPal", icon: CreditCard }
-  ],
-  vouchers: [
-    { name: "Shopee", points: 80, icon: ShoppingBag, discount: "10% cashback on purchases" },
-    { name: "Lazada", points: 80, icon: ShoppingBag, discount: "₱100 off on min. ₱500 purchase" },
-    { name: "Move It", points: 70, icon: Tag, discount: "20% discount on your next ride" }
-  ],
-  load: [
-    { name: "Globe", icon: Phone, image: "https://e7.pngegg.com/pngimages/66/112/png-clipart-globe-telecom-other-telecommunications-cebu-mobile-phones-globe-telecoms-logo-globe-text-thumbnail.png" },
-    { name: "Smart", icon: Phone, image: "https://download.logo.wine/logo/Smart_Communications/Smart_Communications-Logo.wine.png" },
-    { name: "TM", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/commons/6/68/TM_Logo_%282019_-_Present%29.png" },
-    { name: "TNT", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/commons/3/36/TNT_%28cellular_service%29_logo.png" },
-    { name: "DITO", icon: Phone, image: "https://upload.wikimedia.org/wikipedia/commons/5/5d/DITO_Telecommunity_logo.jpg" }
-  ]
-};
+const rewardsCategories = [
+  { name: 'Featured', icon: Award },
+  { name: 'Food', icon: Pizza },
+  { name: 'Transport', icon: Bike },
+  { name: 'Tech', icon: Smartphone },
+  { name: 'Home', icon: Home },
+];
 
-const denominations = {
-  eWallet: [
-    { amount: "₱50", points: 20000 },
-    { amount: "₱100", points: 40000 },
-    { amount: "₱200", points: 60000 },
-    { amount: "₱500", points: 120000 }
-  ],
-  load: [
-    { amount: "Regular ₱10", points: 5000 },
-    { amount: "Regular ₱20", points: 10000 },
-    { amount: "Regular ₱50", points: 25000 },
-    { amount: "Regular ₱100", points: 50000 }
-  ]
-};
+const rewardItems = [
+  {
+    id: 'gcash50',
+    name: 'GCash ₱50',
+    description: 'Get ₱50 GCash credits',
+    points: 50000,
+    image: 'https://i.imgur.com/eGJ5tQ0.png',
+    category: 'Featured'
+  },
+  {
+    id: 'coffee',
+    name: 'Free Coffee',
+    description: 'Free coffee at partner shops',
+    points: 25000,
+    image: 'https://i.imgur.com/aHHDbWJ.png',
+    category: 'Food'
+  },
+  {
+    id: 'movie',
+    name: 'Movie Tickets',
+    description: 'Two tickets to any movie',
+    points: 75000,
+    image: 'https://i.imgur.com/CCasoJY.png',
+    category: 'Featured'
+  },
+  {
+    id: 'fooddiscount',
+    name: '20% Food Discount',
+    description: 'At partner restaurants',
+    points: 30000,
+    image: 'https://i.imgur.com/GbA4cPy.png',
+    category: 'Food'
+  },
+  {
+    id: 'transport',
+    name: 'Free Ride',
+    description: 'One free ride on public transport',
+    points: 15000,
+    image: 'https://i.imgur.com/VWJLmap.png',
+    category: 'Transport'
+  },
+  {
+    id: 'phonediscount',
+    name: '15% Tech Discount',
+    description: 'On eco-friendly gadgets',
+    points: 100000,
+    image: 'https://i.imgur.com/oVGy5GK.png',
+    category: 'Tech'
+  },
+];
 
 export function Rewards() {
-  const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState('eWallet');
-  const [selectedReward, setSelectedReward] = useState('');
-  const [selectedDenomination, setSelectedDenomination] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [activeCategory, setActiveCategory] = useState('Featured');
+  const [selectedReward, setSelectedReward] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [availablePoints, setAvailablePoints] = useState(getUserPoints());
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const [isRedeeming, setIsRedeeming] = useState(false);
+  const { user, profile } = useAuth();
   
-  // Update points display when component mounts or when points change in localStorage
-  useEffect(() => {
-    setAvailablePoints(getUserPoints());
-  }, []);
+  const userPoints = profile?.points || 9999999;
   
-  const handleRedeemClick = () => {
-    if (selectedCategory === 'eWallet' || selectedCategory === 'load') {
-      if (!selectedReward || !selectedDenomination || !phoneNumber || phoneNumber.trim() === '') {
-        toast.error("Please fill in all required fields");
-        return;
-      }
-      
-      // Check if user has enough points
-      const requiredPoints = denominations[selectedCategory].find(d => d.amount === selectedDenomination)?.points || 0;
-      if (availablePoints < requiredPoints) {
-        toast.error("You don't have enough points for this reward");
-        return;
-      }
-    } else if (selectedCategory === 'vouchers') {
-      if (!selectedReward) {
-        toast.error("Please select a voucher");
-        return;
-      }
-      
-      // Check if user has enough points for voucher
-      const selectedVoucher = rewardOptions.vouchers.find(v => v.name === selectedReward);
-      const requiredPoints = selectedVoucher?.points || 0;
-      if (availablePoints < requiredPoints) {
-        toast.error("You don't have enough points for this voucher");
-        return;
-      }
-    }
-    
+  const filteredRewards = rewardItems.filter(
+    reward => activeCategory === 'Featured' ? reward.category === 'Featured' : reward.category === activeCategory
+  );
+  
+  const handleSelectReward = (reward: any) => {
+    setSelectedReward(reward);
     setIsDialogOpen(true);
   };
   
-  const handleConfirmRedeem = () => {
-    setIsDialogOpen(false);
+  const handleRedeemReward = async () => {
+    if (!selectedReward) return;
     
-    let denominationPoints = 0;
-    let rewardName = selectedReward;
-    let amountText = selectedCategory !== 'vouchers' ? selectedDenomination : '';
+    setIsRedeeming(true);
     
-    if (selectedCategory === 'eWallet' || selectedCategory === 'load') {
-      denominationPoints = denominations[selectedCategory].find(d => d.amount === selectedDenomination)?.points || 0;
-    } else {
-      const selectedVoucher = rewardOptions.vouchers.find(v => v.name === selectedReward);
-      denominationPoints = selectedVoucher?.points || 0;
-      amountText = selectedVoucher?.discount || '';
-    }
-    
-    // Deduct points from user's account
-    const newPoints = availablePoints - denominationPoints;
-    setUserPoints(newPoints);
-    setAvailablePoints(newPoints);
-    
-    toast.success(
-      <div className="flex flex-col">
-        <span className="font-semibold">Reward Redeemed!</span>
-        <span className="text-sm">
-          {rewardName} {amountText} 
-          {(selectedCategory === 'eWallet' || selectedCategory === 'load') && phoneNumber && 
-            ` for +63${phoneNumber}`} 
-          has been redeemed for {denominationPoints} eco-points
-        </span>
-      </div>,
-      {
-        duration: 5000,
-        className: "animate-scale-in p-4 bg-background/90 backdrop-blur-md border border-border/50 shadow-lg",
+    try {
+      // Check if user has enough points
+      if (userPoints < selectedReward.points) {
+        toast.error("Not enough points", {
+          description: "You don't have enough points to redeem this reward."
+        });
+        setIsRedeeming(false);
+        return;
       }
-    );
-    
-    setSelectedReward('');
-    setSelectedDenomination('');
-    setPhoneNumber('');
-  };
-
-  const handlePhoneNumberChange = (e) => {
-    // Only allow digits and limit to 10 digits (excluding the country code)
-    const value = e.target.value.replace(/\D/g, '');
-    if (value.length <= 10) {
-      setPhoneNumber(value);
+      
+      // Update user points in the database
+      const newPoints = userPoints - selectedReward.points;
+      const { error } = await supabase
+        .from('profiles')
+        .update({ points: newPoints })
+        .eq('id', user?.id);
+        
+      if (error) {
+        throw error;
+      }
+      
+      // Close the dialog
+      setIsDialogOpen(false);
+      setIsConfirmationOpen(true);
+      
+      toast.success("Reward redeemed!", {
+        description: `You've successfully redeemed ${selectedReward.name}.`
+      });
+    } catch (error: any) {
+      console.error("Error redeeming reward:", error);
+      toast.error("Failed to redeem reward", {
+        description: error.message || "An unexpected error occurred."
+      });
+    } finally {
+      setIsRedeeming(false);
     }
   };
-
+  
   return (
-    <section className="space-y-6 pb-16 animate-fade-in">
+    <div className="space-y-6 animate-fade-in pb-16">
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => navigate('/profile')}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Profile
-        </Button>
-        <Badge variant="outline" className="bg-primary/10 text-primary">
-          Available: {availablePoints.toLocaleString()} Eco-Points
-        </Badge>
+        <div>
+          <h1 className="text-2xl font-semibold">Rewards</h1>
+          <p className="text-muted-foreground">Redeem your eco-points</p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Badge variant="outline" className="py-1.5 px-2.5 text-base">
+            <Coins className="w-4 h-4 mr-1" />
+            {userPoints.toLocaleString()}
+          </Badge>
+        </div>
       </div>
       
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">Redeem Your Rewards</h1>
-        <p className="text-muted-foreground mt-2">
-          Convert your eco-points into valuable rewards
-        </p>
+      {/* Categories */}
+      <div className="overflow-x-auto pb-2">
+        <div className="flex space-x-2 min-w-max">
+          {rewardsCategories.map((category) => {
+            const Icon = category.icon;
+            const isActive = activeCategory === category.name;
+            
+            return (
+              <Button
+                key={category.name}
+                variant={isActive ? "default" : "outline"}
+                className={`flex-shrink-0 transition-all ${isActive ? "" : "opacity-70"}`}
+                onClick={() => setActiveCategory(category.name)}
+              >
+                <Icon className="w-4 h-4 mr-2" />
+                {category.name}
+              </Button>
+            );
+          })}
+        </div>
       </div>
       
-      <Tabs defaultValue="eWallet" className="w-full" onValueChange={setSelectedCategory}>
-        <TabsList className="grid grid-cols-3 h-auto p-1 bg-muted rounded-lg">
-          <TabsTrigger value="eWallet" className="py-2">
-            <Wallet className="mr-2 h-4 w-4" />
-            e-Wallet
-          </TabsTrigger>
-          <TabsTrigger value="vouchers" className="py-2">
-            <ShoppingBag className="mr-2 h-4 w-4" />
-            Vouchers
-          </TabsTrigger>
-          <TabsTrigger value="load" className="py-2">
-            <Phone className="mr-2 h-4 w-4" />
-            Load
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="eWallet" className="mt-6 space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Select e-Wallet</CardTitle>
-              <CardDescription>Choose your preferred e-wallet platform</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <RadioGroup 
-                onValueChange={setSelectedReward} 
-                value={selectedReward}
-                className="space-y-3"
-              >
-                {rewardOptions.eWallet.map((wallet) => (
-                  <div 
-                    key={wallet.name} 
-                    className={cn(
-                      "flex items-center space-x-3 rounded-md border p-4 transition-all",
-                      selectedReward === wallet.name ? "border-primary/50 bg-primary/5" : "border-border"
-                    )}
-                  >
-                    <RadioGroupItem value={wallet.name} id={wallet.name} />
-                    <Label htmlFor={wallet.name} className="flex-1 cursor-pointer flex items-center justify-between">
-                      <div className="flex items-center">
-                        <wallet.icon className="h-5 w-5 mr-2 text-primary" />
-                        {wallet.name}
-                      </div>
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </CardContent>
-            
-            <CardHeader>
-              <CardTitle>Mobile Number</CardTitle>
-              <CardDescription>Enter your mobile number</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center border rounded-md px-3 py-2 bg-muted/50">
-                  <span className="text-sm font-medium">+63</span>
+      {/* Rewards Grid */}
+      <div className="grid grid-cols-2 gap-4">
+        {filteredRewards.map((reward) => (
+          <Card 
+            key={reward.id}
+            className="hover-card overflow-hidden cursor-pointer"
+            onClick={() => handleSelectReward(reward)}
+          >
+            <div 
+              className="h-32 bg-center bg-cover"
+              style={{backgroundImage: `url(${reward.image})`}}
+            />
+            <CardContent className="p-4">
+              <div>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-medium">{reward.name}</h3>
                 </div>
-                <Input
-                  value={phoneNumber}
-                  onChange={handlePhoneNumberChange}
-                  placeholder="9XX XXX XXXX"
-                  className="flex-1"
-                  type="tel"
-                />
+                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                  {reward.description}
+                </p>
+                <div className="flex items-center text-sm font-medium text-primary">
+                  <Coins className="w-4 h-4 mr-1" />
+                  {reward.points.toLocaleString()} points
+                </div>
               </div>
             </CardContent>
-            
-            <Separator className="my-2" />
-            
-            <CardHeader>
-              <CardTitle>Select Amount</CardTitle>
-              <CardDescription>Choose denomination to redeem</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Select value={selectedDenomination} onValueChange={setSelectedDenomination}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select amount" />
-                </SelectTrigger>
-                <SelectContent>
-                  {denominations.eWallet.map((item) => (
-                    <SelectItem key={item.amount} value={item.amount}>
-                      <span className="flex items-center justify-between w-full">
-                        {item.amount} <Badge variant="outline" className="ml-2">{item.points} points</Badge>
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </CardContent>
-            
-            <CardFooter>
-              <Button 
-                onClick={handleRedeemClick} 
-                className="w-full"
-                disabled={!selectedReward || !selectedDenomination || !phoneNumber}
-              >
-                Redeem Reward
-              </Button>
-            </CardFooter>
           </Card>
-        </TabsContent>
-        
-        <TabsContent value="vouchers" className="mt-6 space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Select Voucher</CardTitle>
-              <CardDescription>Choose your preferred shopping platform</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <RadioGroup 
-                onValueChange={setSelectedReward}
-                value={selectedReward}
-                className="space-y-3"
-              >
-                {rewardOptions.vouchers.map((voucher) => (
-                  <div 
-                    key={voucher.name} 
-                    className={cn(
-                      "flex items-center space-x-3 rounded-md border p-4 transition-all",
-                      selectedReward === voucher.name ? "border-primary/50 bg-primary/5" : "border-border"
-                    )}
-                  >
-                    <RadioGroupItem value={voucher.name} id={voucher.name} />
-                    <Label htmlFor={voucher.name} className="flex-1 cursor-pointer">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <voucher.icon className="h-5 w-5 mr-2 text-primary" />
-                          {voucher.name}
-                        </div>
-                        <Badge variant="outline">{voucher.points} points</Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">{voucher.discount}</p>
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </CardContent>
-            
-            <CardFooter>
-              <Button 
-                onClick={handleRedeemClick} 
-                className="w-full"
-                disabled={!selectedReward}
-              >
-                Redeem Voucher
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="load" className="mt-6 space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Select Network</CardTitle>
-              <CardDescription>Choose your preferred mobile network</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <RadioGroup 
-                onValueChange={setSelectedReward}
-                value={selectedReward}
-                className="space-y-3"
-              >
-                {rewardOptions.load.map((network) => (
-                  <div 
-                    key={network.name} 
-                    className={cn(
-                      "flex items-center space-x-3 rounded-md border p-4 transition-all",
-                      selectedReward === network.name ? "border-primary/50 bg-primary/5" : "border-border"
-                    )}
-                  >
-                    <RadioGroupItem value={network.name} id={network.name} />
-                    <Label htmlFor={network.name} className="flex-1 cursor-pointer flex items-center justify-between">
-                      <div className="flex items-center">
-                        <img 
-                          src={network.image} 
-                          alt={network.name} 
-                          className="h-6 w-6 mr-2 object-contain" 
-                        />
-                        {network.name}
-                      </div>
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </CardContent>
-            
-            <CardHeader>
-              <CardTitle>Mobile Number</CardTitle>
-              <CardDescription>Enter your mobile number</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center border rounded-md px-3 py-2 bg-muted/50">
-                  <span className="text-sm font-medium">+63</span>
-                </div>
-                <Input
-                  value={phoneNumber}
-                  onChange={handlePhoneNumberChange}
-                  placeholder="9XX XXX XXXX"
-                  className="flex-1"
-                  type="tel"
-                />
-              </div>
-            </CardContent>
-            
-            <Separator className="my-2" />
-            
-            <CardHeader>
-              <CardTitle>Select Amount</CardTitle>
-              <CardDescription>Choose load denomination</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Select value={selectedDenomination} onValueChange={setSelectedDenomination}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select amount" />
-                </SelectTrigger>
-                <SelectContent>
-                  {denominations.load.map((item) => (
-                    <SelectItem key={item.amount} value={item.amount}>
-                      <span className="flex items-center justify-between w-full">
-                        {item.amount} <Badge variant="outline" className="ml-2">{item.points} points</Badge>
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </CardContent>
-            
-            <CardFooter>
-              <Button 
-                onClick={handleRedeemClick} 
-                className="w-full"
-                disabled={!selectedReward || !selectedDenomination || !phoneNumber}
-              >
-                Redeem Load
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        ))}
+      </div>
       
-      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Redemption</AlertDialogTitle>
-            <AlertDialogDescription>
-              {selectedCategory === 'vouchers' ? (
-                <>
-                  Are you sure you want to redeem {selectedReward} voucher?
-                  
-                  {selectedReward && (
-                    <div className="mt-2 p-3 bg-muted rounded-md">
-                      <p className="font-medium">Redemption Details:</p>
-                      <p className="text-sm">
-                        Reward: {selectedReward}<br />
-                        Points Required: {rewardOptions.vouchers.find(v => v.name === selectedReward)?.points || 0}<br />
-                        Benefit: {rewardOptions.vouchers.find(v => v.name === selectedReward)?.discount}
-                      </p>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  Are you sure you want to redeem {selectedReward} {selectedDenomination} for +63{phoneNumber}?
-                  
-                  {selectedReward && (
-                    <div className="mt-2 p-3 bg-muted rounded-md">
-                      <p className="font-medium">Redemption Details:</p>
-                      <p className="text-sm">
-                        Reward: {selectedReward} {selectedDenomination}<br />
-                        Mobile Number: +63{phoneNumber}<br />
-                        Points Required: {denominations[selectedCategory].find(d => d.amount === selectedDenomination)?.points || 0}
-                      </p>
-                    </div>
-                  )}
-                </>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmRedeem}>Confirm</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </section>
+      {/* Reward Detail Dialog */}
+      {selectedReward && (
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{selectedReward.name}</DialogTitle>
+              <DialogDescription>
+                {selectedReward.description}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4">
+              <div 
+                className="h-48 bg-center bg-cover rounded-md"
+                style={{backgroundImage: `url(${selectedReward.image})`}}
+              />
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Cost</span>
+                  <div className="flex items-center font-medium">
+                    <Coins className="w-4 h-4 mr-1 text-primary" />
+                    {selectedReward.points.toLocaleString()} points
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Your Points</span>
+                  <div className="flex items-center font-medium">
+                    <Coins className="w-4 h-4 mr-1 text-primary" />
+                    {userPoints.toLocaleString()} points
+                  </div>
+                </div>
+              </div>
+            </div>
+            <DialogFooter className="sm:justify-between flex-col sm:flex-row gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => setIsDialogOpen(false)}
+                className="sm:w-auto w-full"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleRedeemReward}
+                disabled={userPoints < selectedReward.points || isRedeeming}
+                className="sm:w-auto w-full"
+              >
+                {isRedeeming ? (
+                  <>
+                    <div className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin mr-2"></div>
+                    Redeeming...
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Redeem Reward
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+      
+      {/* Confirmation Dialog */}
+      {selectedReward && (
+        <Dialog open={isConfirmationOpen} onOpenChange={setIsConfirmationOpen}>
+          <DialogContent className="sm:max-w-md text-center">
+            <div className="flex flex-col items-center justify-center py-4">
+              <div className="h-20 w-20 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mb-4">
+                <GiftIcon className="h-10 w-10 text-green-600 dark:text-green-300" />
+              </div>
+              <DialogTitle className="text-xl">Reward Redeemed!</DialogTitle>
+              <DialogDescription className="mt-2 text-center">
+                You've successfully redeemed {selectedReward.name}. Check your email for more details on how to claim your reward.
+              </DialogDescription>
+              
+              <div className="mt-6 w-full">
+                <Button 
+                  onClick={() => setIsConfirmationOpen(false)}
+                  className="w-full"
+                >
+                  Done
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+      
+    </div>
   );
 }

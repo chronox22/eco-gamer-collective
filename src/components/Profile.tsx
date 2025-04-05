@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,23 +19,15 @@ import {
   Info,
   Gift,
   Moon,
-  Sun
+  Sun,
+  LogOut
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
-
-const initialPoints = 999999;
-
-export const getUserPoints = () => {
-  const savedPoints = localStorage.getItem('userPoints');
-  return savedPoints ? parseInt(savedPoints) : initialPoints;
-};
-
-export const setUserPoints = (points: number) => {
-  localStorage.setItem('userPoints', points.toString());
-};
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface AchievementItemProps {
   title: string;
@@ -91,13 +83,14 @@ function AchievementItem({
 }
 
 export function Profile() {
+  const { user, profile, signOut } = useAuth();
   const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [creditsDialogOpen, setCreditsDialogOpen] = useState(false);
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const navigate = useNavigate();
   
-  useEffect(() => {
+  React.useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     const isDark = savedTheme === 'dark';
     setDarkMode(isDark);
@@ -116,10 +109,33 @@ export function Profile() {
       return newMode;
     });
   };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success("You've been signed out");
+      navigate('/auth');
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast.error("Failed to sign out");
+    }
+  };
+
+  const points = profile?.points || 9999999;
+  const level = profile?.level || 8;
+  const fullName = profile?.full_name || user?.user_metadata?.full_name || 'User';
   
   return (
     <section className="space-y-6 animate-fade-in">
-      <div className="flex justify-end">
+      <div className="flex justify-between">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          onClick={handleSignOut}
+          className="text-red-500 hover:bg-red-500/10 hover:text-red-500"
+        >
+          <LogOut className="h-5 w-5" />
+        </Button>
         <Button 
           variant="ghost" 
           size="icon" 
@@ -130,15 +146,20 @@ export function Profile() {
       </div>
       
       <div className="text-center">
-        <Avatar className="h-24 w-24 mx-auto">
-          <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="User" />
-          <AvatarFallback>AM</AvatarFallback>
-        </Avatar>
-        <h1 className="text-2xl font-medium mt-4">User</h1>
-        <p className="text-muted-foreground">PROTOTYPE ONLY</p>
+        <div className="relative mx-auto">
+          <Avatar className="h-24 w-24 mx-auto">
+            <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt={fullName} />
+            <AvatarFallback>{fullName.substring(0, 2).toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 border-background">
+            {level}
+          </div>
+        </div>
+        <h1 className="text-2xl font-medium mt-4">{fullName}</h1>
+        <p className="text-muted-foreground">Eco Champion</p>
         <div className="flex justify-center mt-2 space-x-2">
-          <Badge variant="outline" className="bg-primary/10 text-primary">Level 10</Badge>
-          <Badge variant="outline">{getUserPoints().toLocaleString()} points</Badge>
+          <Badge variant="outline" className="bg-primary/10 text-primary">Level {level}</Badge>
+          <Badge variant="outline">{points.toLocaleString()} points</Badge>
         </div>
         
         <Button 
