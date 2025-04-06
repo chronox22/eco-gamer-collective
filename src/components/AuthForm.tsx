@@ -27,7 +27,7 @@ export function AuthForm() {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
           options: {
@@ -41,9 +41,18 @@ export function AuthForm() {
           throw error;
         }
         
-        toast.success("Account created! Check your email to verify your account.", {
-          description: "Please verify your email to continue."
-        });
+        // If sign up is successful but email confirmation is required
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+          toast.error("Email already registered", {
+            description: "This email address is already in use."
+          });
+        } else {
+          toast.success("Account created successfully!", {
+            description: "You can now sign in with your email and password."
+          });
+          // Auto-switch to sign in mode after successful registration
+          setIsSignUp(false);
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: formData.email,
