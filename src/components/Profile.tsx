@@ -121,9 +121,14 @@ export function Profile() {
     }
   };
 
-  const points = profile?.points || 9999999;
-  const level = profile?.level || 8;
+  const points = profile?.points || 0;
+  const level = profile?.level || 1;
   const fullName = profile?.full_name || user?.user_metadata?.full_name || 'User';
+  
+  const showTutorial = () => {
+    localStorage.removeItem('tutorialCompleted');
+    navigate('/');
+  };
   
   return (
     <section className="space-y-6 animate-fade-in">
@@ -151,9 +156,6 @@ export function Profile() {
             <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt={fullName} />
             <AvatarFallback>{fullName.substring(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
-          <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 border-background">
-            {level}
-          </div>
         </div>
         <h1 className="text-2xl font-medium mt-4">{fullName}</h1>
         <p className="text-muted-foreground">Eco Champion</p>
@@ -166,6 +168,7 @@ export function Profile() {
           onClick={() => navigate('/rewards')} 
           className="mt-4 animate-pulse hover:animate-none"
           variant="default"
+          data-redeem-button
         >
           <Gift className="mr-2 h-4 w-4" />
           Redeem Your Rewards
@@ -320,6 +323,19 @@ export function Profile() {
                 checked={darkMode} 
                 onCheckedChange={toggleDarkMode} 
               />
+            </div>
+            
+            <Separator />
+            
+            <div className="flex items-center justify-between">
+              <Button 
+                variant="outline" 
+                className="flex items-center space-x-2"
+                onClick={showTutorial}
+              >
+                <Award className="h-5 w-5 text-primary" />
+                <span>Restart App Tutorial</span>
+              </Button>
             </div>
           </div>
         </DialogContent>

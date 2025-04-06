@@ -25,6 +25,7 @@ export function Navigation() {
             <NavLink
               key={item.path}
               to={item.path}
+              data-nav={item.name.toLowerCase()}
               className={({ isActive }) =>
                 cn(
                   'flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors duration-300',
