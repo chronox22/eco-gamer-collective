@@ -27,13 +27,33 @@ export function AuthForm() {
 
     try {
       if (isSignUp) {
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+          toast.error("Invalid email format", {
+            description: "Please enter a valid email address."
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        // Validate password length
+        if (formData.password.length < 6) {
+          toast.error("Password too short", {
+            description: "Password must be at least 6 characters long."
+          });
+          setIsLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
           options: {
             data: {
               full_name: formData.fullName,
-            }
+            },
+            emailRedirectTo: window.location.origin + '/auth'
           }
         });
         
@@ -41,17 +61,27 @@ export function AuthForm() {
           throw error;
         }
         
-        // If sign up is successful but email confirmation is required
+        // Check if user already exists
         if (data.user && data.user.identities && data.user.identities.length === 0) {
           toast.error("Email already registered", {
             description: "This email address is already in use."
           });
         } else {
-          toast.success("Account created successfully!", {
-            description: "You can now sign in with your email and password."
-          });
-          // Auto-switch to sign in mode after successful registration
-          setIsSignUp(false);
+          // Check if email confirmation is enabled
+          const emailConfirmationEnabled = data.user?.confirmation_sent_at;
+          
+          if (emailConfirmationEnabled) {
+            toast.success("Account created! Check your email to verify your account.", {
+              description: "Please verify your email to continue.",
+              duration: 6000
+            });
+          } else {
+            toast.success("Account created successfully!", {
+              description: "You can now sign in with your email and password."
+            });
+            // Auto-switch to sign in mode after successful registration
+            setIsSignUp(false);
+          }
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -69,9 +99,29 @@ export function AuthForm() {
       }
     } catch (error: any) {
       console.error("Authentication error:", error);
-      toast.error("Authentication error", {
-        description: error.message || "An unexpected error occurred."
-      });
+      
+      // Handle specific error messages
+      if (error.message.includes("Email not confirmed")) {
+        toast.error("Email not verified", {
+          description: "Please check your inbox and verify your email before logging in."
+        });
+      } else if (error.message.includes("Invalid login credentials")) {
+        toast.error("Login failed", {
+          description: "Invalid email or password. Please try again."
+        });
+      } else if (error.message.includes("Password should be")) {
+        toast.error("Invalid password", {
+          description: error.message
+        });
+      } else if (error.message.includes("User already registered")) {
+        toast.error("Registration failed", {
+          description: "This email is already registered. Please use a different email or try logging in."
+        });
+      } else {
+        toast.error("Authentication error", {
+          description: error.message || "An unexpected error occurred."
+        });
+      }
     } finally {
       setIsLoading(false);
     }
