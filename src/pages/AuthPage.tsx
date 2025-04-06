@@ -60,8 +60,8 @@ const AuthPage = () => {
       <div className="flex-1 flex flex-col justify-center items-center p-6 z-10 animate-fade-in">
         <AuthForm />
         
-        <div className="mt-16 text-center text-white/80 text-sm max-w-xs">
-          <p>Join our community and start making a positive impact on the environment today</p>
+        <div className="mt-16 text-center text-foreground/90 font-medium max-w-md px-4 text-base leading-relaxed">
+          Join our community and start making a positive impact on the environment today. Together, we can create meaningful change.
         </div>
       </div>
     </div>
