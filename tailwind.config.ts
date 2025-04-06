@@ -114,6 +114,26 @@ export default {
 				'progress-ring': {
 					'0%': { strokeDashoffset: '300' },
 					'100%': { strokeDashoffset: '0' }
+				},
+				'float-slow': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-15px)' }
+				},
+				'float-medium': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
+				},
+				'float-fast': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-5px)' }
+				},
+				'float-card': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-8px)' }
+				},
+				'spin-slow': {
+					'0%': { transform: 'rotate(0deg)' },
+					'100%': { transform: 'rotate(360deg)' }
 				}
 			},
 			animation: {
@@ -127,7 +147,12 @@ export default {
 				'slide-out': 'slide-out 0.4s ease-out',
 				'pulse-slow': 'pulse-slow 3s ease-in-out infinite',
 				'number-count': 'number-count 1.2s ease-in-out',
-				'progress-ring': 'progress-ring 1.5s ease-out forwards'
+				'progress-ring': 'progress-ring 1.5s ease-out forwards',
+				'float-slow': 'float-slow 8s ease-in-out infinite',
+				'float-medium': 'float-medium 6s ease-in-out infinite',
+				'float-fast': 'float-fast 4s ease-in-out infinite',
+				'float-card': 'float-card 5s ease-in-out infinite',
+				'spin-slow': 'spin-slow 20s linear infinite'
 			}
 		}
 	},
