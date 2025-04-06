@@ -85,8 +85,8 @@ export function AuthForm() {
           <Sun className="h-8 w-8 text-white animate-spin-slow" />
           <Leaf className="h-6 w-6 text-white absolute animate-float-medium" />
         </div>
-        <CardTitle className="text-2xl text-white">{isSignUp ? 'Create Account' : 'Welcome Back'}</CardTitle>
-        <CardDescription className="text-white/80">
+        <CardTitle className="text-2xl text-foreground">{isSignUp ? 'Create Account' : 'Welcome Back'}</CardTitle>
+        <CardDescription className="text-muted-foreground">
           {isSignUp
             ? 'Join our eco-friendly community'
             : 'Continue your sustainable journey'}
@@ -97,9 +97,9 @@ export function AuthForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {isSignUp && (
             <div className="space-y-2">
-              <Label htmlFor="fullName" className="text-white">Full Name</Label>
+              <Label htmlFor="fullName" className="text-foreground">Full Name</Label>
               <div className="relative">
-                <User className="absolute left-3 top-2.5 h-4 w-4 text-white/70" />
+                <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="fullName"
                   name="fullName"
@@ -107,16 +107,16 @@ export function AuthForm() {
                   required={isSignUp}
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-green-400 transition-all"
+                  className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
                 />
               </div>
             </div>
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-white">Email</Label>
+            <Label htmlFor="email" className="text-foreground">Email</Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-white/70" />
+              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 id="email"
                 name="email"
@@ -125,15 +125,15 @@ export function AuthForm() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-green-400 transition-all"
+                className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
               />
             </div>
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-white">Password</Label>
+            <Label htmlFor="password" className="text-foreground">Password</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-white/70" />
+              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 id="password"
                 name="password"
@@ -142,7 +142,7 @@ export function AuthForm() {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-green-400 transition-all"
+                className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
               />
             </div>
           </div>
@@ -168,9 +168,9 @@ export function AuthForm() {
       </CardContent>
       
       <CardFooter className="flex flex-col space-y-4 relative z-10">
-        <div className="text-center text-sm text-white/90">
+        <div className="text-center text-sm text-muted-foreground">
           {isSignUp ? 'Already have an account?' : "Don't have an account yet?"}
-          <Button variant="link" className="p-0 h-auto ml-1 text-green-300 hover:text-green-200" onClick={toggleAuthMode}>
+          <Button variant="link" className="p-0 h-auto ml-1 text-primary hover:text-primary/80" onClick={toggleAuthMode}>
             {isSignUp ? 'Sign In' : 'Sign Up'}
           </Button>
         </div>
