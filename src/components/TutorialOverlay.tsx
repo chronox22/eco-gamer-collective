@@ -90,23 +90,27 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
   const [elementPosition, setElementPosition] = useState<{top: number; left: number; width: number; height: number} | null>(null);
 
   useEffect(() => {
-    if (step.highlightSelector) {
-      const element = document.querySelector(step.highlightSelector);
-      if (element) {
-        const rect = element.getBoundingClientRect();
-        setElementPosition({
-          top: rect.top,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height,
-        });
+    function updateElementPosition() {
+      if (step.highlightSelector) {
+        const element = document.querySelector(step.highlightSelector);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          setElementPosition({
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height,
+          });
+        } else {
+          setElementPosition(null);
+        }
       } else {
         setElementPosition(null);
       }
-    } else {
-      setElementPosition(null);
     }
-
+    
+    updateElementPosition();
+    
     // Add scroll to element if needed
     if (step.highlightSelector && step.position !== 'center') {
       const element = document.querySelector(step.highlightSelector);
@@ -114,6 +118,12 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
+    
+    // Add resize listener to handle screen orientation changes
+    window.addEventListener('resize', updateElementPosition);
+    return () => {
+      window.removeEventListener('resize', updateElementPosition);
+    };
   }, [currentStep, step.highlightSelector, step.position]);
 
   const handleNext = () => {
@@ -169,12 +179,19 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm"
+        onClick={(e) => {
+          // Only close if clicking directly on the backdrop, not any children
+          if (e.target === e.currentTarget) {
+            // Optional: close on backdrop click
+            // handleComplete();
+          }
+        }}
       >
         {/* Skip button */}
         <Button 
           variant="outline" 
           size="sm" 
-          className="absolute top-4 right-4 z-50" 
+          className="absolute top-4 right-4 z-[60]" 
           onClick={handleComplete}
         >
           <X className="h-4 w-4 mr-1" />
@@ -193,6 +210,7 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
               width: elementPosition.width + 16,
               height: elementPosition.height + 16,
               boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.75)',
+              pointerEvents: 'none', // Make sure this doesn't block clicks
             }}
           />
         )}
@@ -202,7 +220,7 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="absolute z-50 glass-card p-6 rounded-xl shadow-lg max-w-md"
+          className="absolute z-[60] glass-card p-6 rounded-xl shadow-lg max-w-md pointer-events-auto" // Add pointer-events-auto
           style={{
             ...getTooltipPosition(),
             width: '90%',
@@ -213,7 +231,7 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
             <div className="bg-primary/10 p-2 rounded-full">
               <Icon className="h-6 w-6 text-primary" />
             </div>
-            <h3 className="text-xl font-medium">{step.title}</h3>
+            <h3 className="text-xl font-medium text-foreground">{step.title}</h3>
           </div>
           
           <p className="text-muted-foreground mb-6">{step.description}</p>

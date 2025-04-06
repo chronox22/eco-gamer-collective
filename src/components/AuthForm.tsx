@@ -78,6 +78,13 @@ export function AuthForm() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        }
       });
       
       if (error) throw error;
@@ -338,7 +345,7 @@ export function AuthForm() {
               
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t"></span>
+                  <span className="w-full border-t border-border"></span>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
@@ -348,7 +355,7 @@ export function AuthForm() {
               <Button 
                 type="button" 
                 variant="outline" 
-                className="w-full" 
+                className="w-full text-foreground border-border" 
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
               >
@@ -404,7 +411,7 @@ export function AuthForm() {
               ) : (
                 <div className="space-y-4">
                   <div className="text-center mb-4">
-                    <h4 className="font-medium">Verification Code</h4>
+                    <h4 className="font-medium text-foreground">Verification Code</h4>
                     <p className="text-sm text-muted-foreground mt-1">
                       Enter the 6-digit code sent to {formData.phone}
                     </p>
