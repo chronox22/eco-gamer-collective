@@ -179,13 +179,6 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm"
-        onClick={(e) => {
-          // Only close if clicking directly on the backdrop, not any children
-          if (e.target === e.currentTarget) {
-            // Optional: close on backdrop click
-            // handleComplete();
-          }
-        }}
       >
         {/* Skip button */}
         <Button 
@@ -220,7 +213,7 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="absolute z-[60] glass-card p-6 rounded-xl shadow-lg max-w-md pointer-events-auto" // Add pointer-events-auto
+          className="absolute z-[60] glass-card p-6 rounded-xl shadow-lg max-w-md bg-card pointer-events-auto" 
           style={{
             ...getTooltipPosition(),
             width: '90%',

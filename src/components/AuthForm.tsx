@@ -76,7 +76,7 @@ export function AuthForm() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: window.location.origin,
@@ -89,11 +89,12 @@ export function AuthForm() {
       
       if (error) throw error;
       
+      console.log("Google sign-in initiated:", data);
       // The redirect happens automatically, no need for toast here
     } catch (error: any) {
       console.error("Google auth error:", error);
       toast.error("Authentication error", {
-        description: error.message || "An unexpected error occurred."
+        description: error.error_description || error.message || "An unexpected error occurred."
       });
       setIsLoading(false);
     }
@@ -107,7 +108,7 @@ export function AuthForm() {
       if (isSignUp) {
         if (authMethod === 'email') {
           // Email signup
-          const { error } = await supabase.auth.signUp({
+          const { data, error } = await supabase.auth.signUp({
             email: formData.email,
             password: formData.password,
             options: {
@@ -119,6 +120,7 @@ export function AuthForm() {
           
           if (error) throw error;
           
+          console.log("Signup successful:", data);
           toast.success("Account created! Check your email to verify your account.", {
             description: "Please verify your email to continue."
           });
@@ -129,7 +131,7 @@ export function AuthForm() {
               throw new Error("Please enter a valid Philippine mobile number (+639XXXXXXXXX)");
             }
             
-            const { error } = await supabase.auth.signInWithOtp({
+            const { data, error } = await supabase.auth.signInWithOtp({
               phone: formData.phone,
               options: {
                 data: {
@@ -140,6 +142,7 @@ export function AuthForm() {
             
             if (error) throw error;
             
+            console.log("OTP sent:", data);
             setPhoneStep('otp');
             toast.success("Verification code sent", {
               description: "Please check your phone for the verification code."
@@ -148,7 +151,7 @@ export function AuthForm() {
             return;
           } else {
             // Verify OTP
-            const { error } = await supabase.auth.verifyOtp({
+            const { data, error } = await supabase.auth.verifyOtp({
               phone: formData.phone,
               token: formData.otp,
               type: 'sms'
@@ -156,6 +159,7 @@ export function AuthForm() {
             
             if (error) throw error;
             
+            console.log("OTP verification successful:", data);
             toast.success("Phone number verified!", {
               description: "You're successfully signed in."
             });
@@ -165,13 +169,14 @@ export function AuthForm() {
         // Sign in
         if (authMethod === 'email') {
           // Email signin
-          const { error } = await supabase.auth.signInWithPassword({
+          const { data, error } = await supabase.auth.signInWithPassword({
             email: formData.email,
             password: formData.password
           });
           
           if (error) throw error;
           
+          console.log("Sign in successful:", data);
           toast.success("Welcome back!", {
             description: "Successfully logged in."
           });
@@ -182,12 +187,13 @@ export function AuthForm() {
               throw new Error("Please enter a valid Philippine mobile number (+639XXXXXXXXX)");
             }
             
-            const { error } = await supabase.auth.signInWithOtp({
+            const { data, error } = await supabase.auth.signInWithOtp({
               phone: formData.phone
             });
             
             if (error) throw error;
             
+            console.log("OTP sent for signin:", data);
             setPhoneStep('otp');
             toast.success("Verification code sent", {
               description: "Please check your phone for the verification code."
@@ -196,7 +202,7 @@ export function AuthForm() {
             return;
           } else {
             // Verify OTP
-            const { error } = await supabase.auth.verifyOtp({
+            const { data, error } = await supabase.auth.verifyOtp({
               phone: formData.phone,
               token: formData.otp,
               type: 'sms'
@@ -204,6 +210,7 @@ export function AuthForm() {
             
             if (error) throw error;
             
+            console.log("OTP verification successful:", data);
             toast.success("Welcome back!", {
               description: "Successfully logged in."
             });
@@ -213,7 +220,7 @@ export function AuthForm() {
     } catch (error: any) {
       console.error("Authentication error:", error);
       toast.error("Authentication error", {
-        description: error.message || "An unexpected error occurred."
+        description: error.error_description || error.message || "An unexpected error occurred."
       });
     } finally {
       setIsLoading(false);
@@ -235,7 +242,7 @@ export function AuthForm() {
       <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-primary/10 blur-3xl"></div>
       <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-accent/10 blur-3xl"></div>
       
-      <div className="absolute inset-0 bg-black/5 backdrop-blur-sm z-0"></div>
+      <div className="absolute inset-0 bg-black/10 backdrop-blur-sm z-0"></div>
       
       <CardHeader className="space-y-2 text-center relative z-10">
         <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center mb-2 shadow-lg animate-pulse-slow">
@@ -285,7 +292,7 @@ export function AuthForm() {
                       required={isSignUp}
                       value={formData.fullName}
                       onChange={handleChange}
-                      className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
+                      className="pl-10 bg-background/70 border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
                     />
                   </div>
                 </div>
@@ -303,7 +310,7 @@ export function AuthForm() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
+                    className="pl-10 bg-background/70 border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
                   />
                 </div>
               </div>
@@ -320,7 +327,7 @@ export function AuthForm() {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
+                    className="pl-10 bg-background/70 border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
                   />
                 </div>
               </div>
@@ -348,14 +355,14 @@ export function AuthForm() {
                   <span className="w-full border-t border-border"></span>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                  <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
                 </div>
               </div>
               
               <Button 
                 type="button" 
                 variant="outline" 
-                className="w-full text-foreground border-border" 
+                className="w-full text-foreground border-border bg-background/70" 
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
               >
@@ -384,7 +391,7 @@ export function AuthForm() {
                       required={isSignUp}
                       value={formData.fullName}
                       onChange={handleChange}
-                      className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
+                      className="pl-10 bg-background/70 border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
                     />
                   </div>
                 </div>
@@ -403,7 +410,7 @@ export function AuthForm() {
                       required
                       value={formData.phone}
                       onChange={handlePhoneChange}
-                      className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
+                      className="pl-10 bg-background/70 border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">Format: +639XXXXXXXXX</p>
