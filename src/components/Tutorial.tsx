@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -76,7 +75,7 @@ export const Tutorial: React.FC = () => {
     
     if (step.position === 'center') {
       setPosition({
-        top: window.innerHeight / 2 - 150,
+        top: Math.max(window.innerHeight / 2 - 150, 80),
         left: window.innerWidth / 2 - 150,
         width: 300,
         height: 300
@@ -91,17 +90,26 @@ export const Tutorial: React.FC = () => {
     }
     
     const rect = targetElement.getBoundingClientRect();
+    const navbarOffset = 70;
     
     let top = 0;
     let left = 0;
     
     switch (step.position) {
       case 'top':
-        top = rect.top - 120;
+        if (rect.top > 200) {
+          top = rect.top - 120;
+        } else {
+          top = rect.bottom + 20;
+        }
         left = rect.left + rect.width / 2 - 150;
         break;
       case 'bottom':
-        top = rect.bottom + 20;
+        if (rect.bottom + 150 > window.innerHeight - navbarOffset) {
+          top = Math.max(rect.top - 150, 20);
+        } else {
+          top = rect.bottom + 20;
+        }
         left = rect.left + rect.width / 2 - 150;
         break;
       case 'left':
@@ -114,11 +122,14 @@ export const Tutorial: React.FC = () => {
         break;
     }
     
-    // Ensure tutorial stays within viewport
     if (left < 20) left = 20;
     if (left > window.innerWidth - 320) left = window.innerWidth - 320;
     if (top < 20) top = 20;
-    if (top > window.innerHeight - 200) top = window.innerHeight - 200;
+    
+    const maxBottom = window.innerHeight - navbarOffset - 100;
+    if (top > maxBottom - 200) {
+      top = Math.max(20, maxBottom - 200);
+    }
     
     setPosition({ 
       top, 
@@ -138,11 +149,9 @@ export const Tutorial: React.FC = () => {
     const targetElement = document.querySelector(step.target);
     if (!targetElement) return;
     
-    // Add highlight class to target element
     targetElement.classList.add('tutorial-highlight');
     
     return () => {
-      // Remove highlight when step changes
       targetElement.classList.remove('tutorial-highlight');
     };
   }, [currentStep, isVisible]);
@@ -201,7 +210,9 @@ export const Tutorial: React.FC = () => {
         style={{
           top: `${position.top}px`,
           left: `${position.left}px`,
-          transform: 'translate3d(0, 0, 0)', // Force GPU acceleration for smoother animations
+          transform: 'translate3d(0, 0, 0)',
+          maxHeight: '85vh',
+          overflowY: 'auto'
         }}
       >
         <Button 
