@@ -13,7 +13,7 @@ const Index = () => {
     const checkTutorialStatus = async () => {
       if (user && profile) {
         // Only show tutorial if user is new and tutorial_completed is explicitly false
-        // This ensures existing users who have null value don't see the tutorial
+        // Once completed, tutorial will never show again
         const shouldShowTutorial = profile.tutorial_completed === false;
         setShowTutorial(shouldShowTutorial);
       }

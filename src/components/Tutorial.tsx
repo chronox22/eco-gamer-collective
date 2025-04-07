@@ -1,7 +1,8 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Home, CalendarCheck2, BookOpen, Trophy, User, X } from 'lucide-react';
+import { Home, CalendarCheck2, BookOpen, Trophy, User, X, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -42,6 +43,13 @@ const tutorialSteps: TutorialStep[] = [
     position: 'bottom',
     target: '[data-nav="learn"]',
     icon: <BookOpen className="h-6 w-6 text-primary mb-2" />
+  },
+  {
+    title: 'Community',
+    description: 'Connect with other eco-minded people and join challenges together.',
+    position: 'bottom',
+    target: '[data-nav="community"]',
+    icon: <Users className="h-6 w-6 text-primary mb-2" />
   },
   {
     title: 'Your Profile',
