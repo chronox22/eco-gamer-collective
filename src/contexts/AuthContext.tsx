@@ -8,6 +8,7 @@ type Profile = {
   full_name: string | null;
   level: number | null;
   points: number | null;
+  tutorial_completed: boolean | null;
   created_at: string | null;
   updated_at: string | null;
 };

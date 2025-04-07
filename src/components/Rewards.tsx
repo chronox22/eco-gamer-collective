@@ -108,9 +108,7 @@ export function Rewards() {
         .update({ points: newPoints })
         .eq('id', user.id);
         
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
       
       // Close the dialog
       setIsDialogOpen(false);

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Home, CalendarCheck2, BookOpen, Trophy, User, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface TutorialStep {
   title: string;
@@ -68,7 +68,6 @@ export const Tutorial: React.FC = () => {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
 
-  // Calculate position based on target element
   useEffect(() => {
     if (!isVisible) return;
     
@@ -114,7 +113,6 @@ export const Tutorial: React.FC = () => {
         break;
     }
     
-    // Ensure tutorial stays within viewport
     if (left < 20) left = 20;
     if (left > window.innerWidth - 320) left = window.innerWidth - 320;
     if (top < 20) top = 20;
@@ -128,7 +126,6 @@ export const Tutorial: React.FC = () => {
     });
   }, [currentStep, isVisible]);
   
-  // Highlight target element with overlay
   useEffect(() => {
     if (!isVisible) return;
     
@@ -138,16 +135,13 @@ export const Tutorial: React.FC = () => {
     const targetElement = document.querySelector(step.target);
     if (!targetElement) return;
     
-    // Add highlight class to target element
     targetElement.classList.add('tutorial-highlight');
     
     return () => {
-      // Remove highlight when step changes
       targetElement.classList.remove('tutorial-highlight');
     };
   }, [currentStep, isVisible]);
   
-  // Handle next step
   const handleNext = () => {
     if (currentStep < tutorialSteps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -156,24 +150,24 @@ export const Tutorial: React.FC = () => {
     }
   };
   
-  // Skip tutorial and mark as completed
   const handleSkip = () => {
     completeTutorial();
   };
   
-  // Mark tutorial as completed in user profile
   const completeTutorial = async () => {
     setIsVisible(false);
     
     if (user) {
       try {
-        // Update user profile to mark tutorial as completed
-        await supabase
+        const { error } = await supabase
           .from('profiles')
           .update({ tutorial_completed: true })
           .eq('id', user.id);
+        
+        if (error) throw error;
       } catch (error) {
         console.error('Failed to update tutorial status:', error);
+        toast.error('Failed to complete tutorial');
       }
     }
     
@@ -185,12 +179,10 @@ export const Tutorial: React.FC = () => {
   return (
     <AnimatePresence>
       <div className="fixed inset-0 bg-black/50 z-50 overflow-hidden">
-        {/* Overlay with cutout for target element */}
         {tutorialSteps[currentStep].position !== 'center' && (
           <div className="absolute inset-0 pointer-events-none" />
         )}
         
-        {/* Tutorial card */}
         <motion.div
           ref={tutorialRef}
           initial={{ opacity: 0, y: 20 }}
@@ -212,7 +204,6 @@ export const Tutorial: React.FC = () => {
             <X className="h-4 w-4" />
           </Button>
           
-          {/* Progress indicator */}
           <div className="flex gap-1 mb-4">
             {tutorialSteps.map((_, index) => (
               <div 

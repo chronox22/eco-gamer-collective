@@ -128,10 +128,12 @@ export function Profile() {
     if (!user) return;
     
     try {
-      await supabase
+      const { error } = await supabase
         .from('profiles')
         .update({ tutorial_completed: false })
         .eq('id', user.id);
+      
+      if (error) throw error;
       
       toast.success("Tutorial will restart", {
         description: "You'll see the tutorial when you go back to the home page."
