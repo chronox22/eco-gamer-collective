@@ -130,7 +130,9 @@ export function Profile() {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ tutorial_completed: false })
+        .update({ 
+          tutorial_completed: false 
+        })
         .eq('id', user.id);
       
       if (error) throw error;
@@ -146,8 +148,8 @@ export function Profile() {
     }
   };
 
-  const points = profile?.points || 9999999;
-  const level = profile?.level || 8;
+  const points = profile?.points || 0;
+  const level = profile?.level || 1;
   const fullName = profile?.full_name || user?.user_metadata?.full_name || 'User';
   
   return (

@@ -1,6 +1,6 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Home, CalendarCheck2, BookOpen, Trophy, User, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -161,10 +161,18 @@ export const Tutorial: React.FC = () => {
       try {
         const { error } = await supabase
           .from('profiles')
-          .update({ tutorial_completed: true })
+          .update({ 
+            tutorial_completed: true 
+          })
           .eq('id', user.id);
         
-        if (error) throw error;
+        if (error) {
+          console.error('Failed to update tutorial status:', error);
+          toast.error('Failed to complete tutorial');
+          return;
+        }
+
+        toast.success('Tutorial completed!');
       } catch (error) {
         console.error('Failed to update tutorial status:', error);
         toast.error('Failed to complete tutorial');
@@ -177,71 +185,65 @@ export const Tutorial: React.FC = () => {
   if (!isVisible) return null;
   
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 bg-black/50 z-50 overflow-hidden">
-        {tutorialSteps[currentStep].position !== 'center' && (
-          <div className="absolute inset-0 pointer-events-none" />
-        )}
-        
-        <motion.div
-          ref={tutorialRef}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.3 }}
-          className="absolute bg-card backdrop-blur-md rounded-lg shadow-xl border border-primary/20 p-6 w-[300px] z-50"
-          style={{
-            top: `${position.top}px`,
-            left: `${position.left}px`,
-          }}
+    <div className="fixed inset-0 bg-black/50 z-50 overflow-hidden">
+      {tutorialSteps[currentStep].position !== 'center' && (
+        <div className="absolute inset-0 pointer-events-none" />
+      )}
+      
+      <div
+        ref={tutorialRef}
+        className="absolute bg-card backdrop-blur-md rounded-lg shadow-xl border border-primary/20 p-6 w-[300px] z-50"
+        style={{
+          top: `${position.top}px`,
+          left: `${position.left}px`,
+        }}
+      >
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="absolute right-2 top-2 text-muted-foreground"
+          onClick={handleSkip}
         >
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="absolute right-2 top-2 text-muted-foreground"
-            onClick={handleSkip}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          <X className="h-4 w-4" />
+        </Button>
+        
+        <div className="flex gap-1 mb-4">
+          {tutorialSteps.map((_, index) => (
+            <div 
+              key={index} 
+              className={`h-1 rounded-full flex-1 transition-colors ${
+                index === currentStep ? 'bg-primary' : 'bg-primary/20'
+              }`} 
+            />
+          ))}
+        </div>
+        
+        <div className="flex flex-col items-center text-center">
+          {tutorialSteps[currentStep].icon}
+          <h3 className="font-semibold text-lg mb-2">
+            {tutorialSteps[currentStep].title}
+          </h3>
+          <p className="text-muted-foreground text-sm mb-6">
+            {tutorialSteps[currentStep].description}
+          </p>
           
-          <div className="flex gap-1 mb-4">
-            {tutorialSteps.map((_, index) => (
-              <div 
-                key={index} 
-                className={`h-1 rounded-full flex-1 transition-colors ${
-                  index === currentStep ? 'bg-primary' : 'bg-primary/20'
-                }`} 
-              />
-            ))}
+          <div className="flex justify-between w-full">
+            <Button 
+              variant="outline" 
+              onClick={handleSkip}
+              size="sm"
+            >
+              Skip
+            </Button>
+            <Button 
+              onClick={handleNext}
+              size="sm"
+            >
+              {currentStep < tutorialSteps.length - 1 ? 'Next' : 'Finish'}
+            </Button>
           </div>
-          
-          <div className="flex flex-col items-center text-center">
-            {tutorialSteps[currentStep].icon}
-            <h3 className="font-semibold text-lg mb-2">
-              {tutorialSteps[currentStep].title}
-            </h3>
-            <p className="text-muted-foreground text-sm mb-6">
-              {tutorialSteps[currentStep].description}
-            </p>
-            
-            <div className="flex justify-between w-full">
-              <Button 
-                variant="outline" 
-                onClick={handleSkip}
-                size="sm"
-              >
-                Skip
-              </Button>
-              <Button 
-                onClick={handleNext}
-                size="sm"
-              >
-                {currentStep < tutorialSteps.length - 1 ? 'Next' : 'Finish'}
-              </Button>
-            </div>
-          </div>
-        </motion.div>
+        </div>
       </div>
-    </AnimatePresence>
+    </div>
   );
 };
