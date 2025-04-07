@@ -4,7 +4,6 @@ import { Layout } from '@/components/Layout';
 import { Dashboard } from '@/components/Dashboard';
 import { Tutorial } from '@/components/Tutorial';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const [showTutorial, setShowTutorial] = useState(false);
@@ -13,11 +12,10 @@ const Index = () => {
   useEffect(() => {
     const checkTutorialStatus = async () => {
       if (user && profile) {
-        const tutorialCompleted = profile.tutorial_completed ?? false;
-        
-        if (!tutorialCompleted) {
-          setShowTutorial(true);
-        }
+        // Only show tutorial if user is new and tutorial_completed is explicitly false
+        // This ensures existing users who have null value don't see the tutorial
+        const shouldShowTutorial = profile.tutorial_completed === false;
+        setShowTutorial(shouldShowTutorial);
       }
     };
     

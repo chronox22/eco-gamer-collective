@@ -68,6 +68,7 @@ export const Tutorial: React.FC = () => {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
 
+  // Calculate position based on target element
   useEffect(() => {
     if (!isVisible) return;
     
@@ -113,6 +114,7 @@ export const Tutorial: React.FC = () => {
         break;
     }
     
+    // Ensure tutorial stays within viewport
     if (left < 20) left = 20;
     if (left > window.innerWidth - 320) left = window.innerWidth - 320;
     if (top < 20) top = 20;
@@ -126,6 +128,7 @@ export const Tutorial: React.FC = () => {
     });
   }, [currentStep, isVisible]);
   
+  // Highlight target element with overlay
   useEffect(() => {
     if (!isVisible) return;
     
@@ -135,9 +138,11 @@ export const Tutorial: React.FC = () => {
     const targetElement = document.querySelector(step.target);
     if (!targetElement) return;
     
+    // Add highlight class to target element
     targetElement.classList.add('tutorial-highlight');
     
     return () => {
+      // Remove highlight when step changes
       targetElement.classList.remove('tutorial-highlight');
     };
   }, [currentStep, isVisible]);
@@ -192,10 +197,11 @@ export const Tutorial: React.FC = () => {
       
       <div
         ref={tutorialRef}
-        className="absolute bg-card backdrop-blur-md rounded-lg shadow-xl border border-primary/20 p-6 w-[300px] z-50"
+        className="absolute bg-card backdrop-blur-md rounded-lg shadow-xl border border-primary/20 p-6 w-[300px] z-50 tutorial-step"
         style={{
           top: `${position.top}px`,
           left: `${position.left}px`,
+          transform: 'translate3d(0, 0, 0)', // Force GPU acceleration for smoother animations
         }}
       >
         <Button 

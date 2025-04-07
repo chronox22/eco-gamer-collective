@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { Navigation } from './Navigation';
 import { addTutorialAttributes } from './TutorialHelpers';
 
-export function Layout({ children }) {
+export function Layout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Add data-nav attributes to navigation items for the tutorial
     addTutorialAttributes();
