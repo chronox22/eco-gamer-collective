@@ -2,9 +2,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
 
-type Profile = Database['public']['Tables']['profiles']['Row'];
+type Profile = {
+  id: string;
+  full_name: string | null;
+  level: number | null;
+  points: number | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
 
 type AuthContextType = {
   session: Session | null;

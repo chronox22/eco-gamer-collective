@@ -7,9 +7,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Database } from '@/integrations/supabase/types';
-
-type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const rewardsCategories = [
   { name: 'Featured', icon: Award },
@@ -90,7 +87,7 @@ export function Rewards() {
   };
   
   const handleRedeemReward = async () => {
-    if (!selectedReward) return;
+    if (!selectedReward || !user) return;
     
     setIsRedeeming(true);
     
@@ -109,7 +106,7 @@ export function Rewards() {
       const { error } = await supabase
         .from('profiles')
         .update({ points: newPoints })
-        .eq('id', user?.id);
+        .eq('id', user.id);
         
       if (error) {
         throw error;

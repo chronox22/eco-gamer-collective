@@ -20,7 +20,8 @@ import {
   Gift,
   Moon,
   Sun,
-  LogOut
+  LogOut,
+  HelpCircle
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
@@ -28,6 +29,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { TutorialRestartButton } from './TutorialHelpers';
 
 interface AchievementItemProps {
   title: string;
@@ -121,6 +124,26 @@ export function Profile() {
     }
   };
 
+  const handleRestartTutorial = async () => {
+    if (!user) return;
+    
+    try {
+      await supabase
+        .from('profiles')
+        .update({ tutorial_completed: false })
+        .eq('id', user.id);
+      
+      toast.success("Tutorial will restart", {
+        description: "You'll see the tutorial when you go back to the home page."
+      });
+      setSettingsDialogOpen(false);
+      navigate('/');
+    } catch (error) {
+      console.error("Failed to restart tutorial:", error);
+      toast.error("Failed to restart tutorial");
+    }
+  };
+
   const points = profile?.points || 9999999;
   const level = profile?.level || 8;
   const fullName = profile?.full_name || user?.user_metadata?.full_name || 'User';
@@ -151,9 +174,6 @@ export function Profile() {
             <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt={fullName} />
             <AvatarFallback>{fullName.substring(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
-          <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 border-background">
-            {level}
-          </div>
         </div>
         <h1 className="text-2xl font-medium mt-4">{fullName}</h1>
         <p className="text-muted-foreground">Eco Champion</p>
@@ -320,6 +340,20 @@ export function Profile() {
                 checked={darkMode} 
                 onCheckedChange={toggleDarkMode} 
               />
+            </div>
+            
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center space-x-2">
+                <HelpCircle className="h-5 w-5 text-primary" />
+                <span>App Tutorial</span>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={handleRestartTutorial}
+              >
+                Restart
+              </Button>
             </div>
           </div>
         </DialogContent>
