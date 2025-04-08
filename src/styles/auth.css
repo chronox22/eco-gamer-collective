@@ -1,0 +1,81 @@
+
+/* Auth page animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.onboarding-image {
+  animation: float 6s ease-in-out infinite;
+}
+
+.auth-card-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.auth-card-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.auth-card-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.auth-card-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Subtle hover effects for form elements */
+.auth-input {
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.auth-input:focus {
+  border-color: theme('colors.green.400');
+  box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.2);
+}
+
+.auth-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.auth-button:after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%);
+  transform-origin: 50% 50%;
+}
+
+.auth-button:focus:not(:active)::after {
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(20, 20);
+    opacity: 0;
+  }
+}

@@ -6,11 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Leaf, Mail, Lock, User, Sun, ArrowRight } from 'lucide-react';
+import { Leaf, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export function AuthForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [tab, setTab] = useState<'signin' | 'signup'>('signin');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -26,7 +28,7 @@ export function AuthForm() {
     setIsLoading(true);
 
     try {
-      if (isSignUp) {
+      if (tab === 'signup') {
         // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.email)) {
@@ -80,7 +82,7 @@ export function AuthForm() {
               description: "You can now sign in with your email and password."
             });
             // Auto-switch to sign in mode after successful registration
-            setIsSignUp(false);
+            setTab('signin');
           }
         }
       } else {
@@ -127,113 +129,159 @@ export function AuthForm() {
     }
   };
 
-  const toggleAuthMode = () => {
-    setIsSignUp(!isSignUp);
-  };
-
   return (
-    <Card className="w-full max-w-md glass-card overflow-hidden animate-float-card shadow-xl border-white/20">
-      {/* Animated card background */}
-      <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-primary/10 blur-3xl"></div>
-      <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-accent/10 blur-3xl"></div>
-      
-      <div className="absolute inset-0 bg-black/5 backdrop-blur-sm z-0"></div>
-      
-      <CardHeader className="space-y-2 text-center relative z-10">
-        <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center mb-2 shadow-lg animate-pulse-slow">
-          <Sun className="h-8 w-8 text-white animate-spin-slow" />
-          <Leaf className="h-6 w-6 text-white absolute animate-float-medium" />
-        </div>
-        <CardTitle className="text-2xl text-foreground">{isSignUp ? 'Create Account' : 'Welcome Back'}</CardTitle>
-        <CardDescription className="text-muted-foreground">
-          {isSignUp
-            ? 'Join our eco-friendly community'
-            : 'Continue your sustainable journey'}
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent className="relative z-10">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {isSignUp && (
-            <div className="space-y-2">
-              <Label htmlFor="fullName" className="text-foreground">Full Name</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="fullName"
-                  name="fullName"
-                  placeholder="Enter your full name"
-                  required={isSignUp}
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
-                />
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.1 }}
+    >
+      <Card className="overflow-hidden backdrop-blur-lg bg-white/10 border border-white/20 shadow-xl">
+        <CardContent className="px-6 py-8">
+          <Tabs value={tab} onValueChange={(v) => setTab(v as 'signin' | 'signup')} className="w-full">
+            <TabsList className="grid grid-cols-2 mb-6 bg-white/10">
+              <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <TabsContent value="signin" className="mt-0">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-white/90">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-2.5 h-4 w-4 text-white/60" />
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        required
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-green-400"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password" className="text-white/90">Password</Label>
+                      <a href="#" className="text-xs text-white/70 hover:text-white">Forgot password?</a>
+                    </div>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-2.5 h-4 w-4 text-white/60" />
+                      <Input
+                        id="password"
+                        name="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        required
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-green-400"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="signup" className="mt-0">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName" className="text-white/90">Full Name</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-2.5 h-4 w-4 text-white/60" />
+                      <Input
+                        id="fullName"
+                        name="fullName"
+                        placeholder="Enter your full name"
+                        required={tab === 'signup'}
+                        value={formData.fullName}
+                        onChange={handleChange}
+                        className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-green-400"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-white/90">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-2.5 h-4 w-4 text-white/60" />
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        required
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-green-400"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-white/90">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-2.5 h-4 w-4 text-white/60" />
+                      <Input
+                        id="password"
+                        name="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        required
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-green-400"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <Button 
+                type="submit" 
+                className="w-full mt-6 bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white border-none flex items-center justify-center gap-2 group transition-all duration-300" 
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    {tab === 'signup' ? 'Creating Account...' : 'Signing In...'}
+                  </div>
+                ) : (
+                  <>
+                    <span>{tab === 'signup' ? 'Sign Up' : 'Sign In'}</span>
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </Button>
+            </form>
+          </Tabs>
+          
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-white/10" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-black/20 px-2 text-white/60 backdrop-blur-sm rounded">
+                  or continue with
+                </span>
               </div>
             </div>
-          )}
-          
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground">Email</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter your email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
-              />
+            
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                Google
+              </Button>
+              <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                GitHub
+              </Button>
             </div>
           </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-foreground">Password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Enter your password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-all"
-              />
-            </div>
-          </div>
-          
-          <Button 
-            type="submit" 
-            className="w-full mt-6 bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white border-none flex items-center justify-center gap-2 group transition-all duration-300" 
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin mr-2"></div>
-                {isSignUp ? 'Creating Account...' : 'Signing In...'}
-              </div>
-            ) : (
-              <>
-                <span>{isSignUp ? 'Sign Up' : 'Sign In'}</span>
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </>
-            )}
-          </Button>
-        </form>
-      </CardContent>
-      
-      <CardFooter className="flex flex-col space-y-4 relative z-10">
-        <div className="text-center text-sm text-muted-foreground">
-          {isSignUp ? 'Already have an account?' : "Don't have an account yet?"}
-          <Button variant="link" className="p-0 h-auto ml-1 text-primary hover:text-primary/80" onClick={toggleAuthMode}>
-            {isSignUp ? 'Sign In' : 'Sign Up'}
-          </Button>
-        </div>
-      </CardFooter>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
