@@ -24,8 +24,8 @@ const slides = [
     color: "from-emerald-400/20 to-teal-300/20"
   },
   {
-    title: 'Grow Together',
-    description: 'Plant the seeds of change and watch your positive impact on the environment grow with every action.',
+    title: 'Earn Eco-points',
+    description: 'Redeem your rewards for making sustainable choices and contributing to a greener planet.',
     icon: <Sprout className="h-full w-full text-green-500" />,
     color: "from-green-500/20 to-lime-300/20"
   }
@@ -150,7 +150,7 @@ export const OnboardingSlider = ({ onComplete, onSkip }: OnboardingSliderProps) 
       </div>
 
       {/* Next button */}
-      <div className="px-8 pb-8">
+      <div className="px-8 pb-8 absolute bottom-0 left-0 right-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -168,3 +168,4 @@ export const OnboardingSlider = ({ onComplete, onSkip }: OnboardingSliderProps) 
     </div>
   );
 };
+
