@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -209,6 +210,24 @@ const AuthPage = () => {
               </motion.div>
               
               <AuthForm />
+              
+              {wasOnboarded && (
+                <motion.div 
+                  className="mt-6 text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1, duration: 0.6 }}
+                >
+                  <motion.button 
+                    onClick={handleShowOnboarding} 
+                    className="text-white/70 hover:text-white text-sm underline underline-offset-4 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    View intro again
+                  </motion.button>
+                </motion.div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
