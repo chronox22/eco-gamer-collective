@@ -24,8 +24,8 @@ const slides = [
     color: "from-emerald-400/20 to-teal-300/20"
   },
   {
-    title: 'Grow Together',
-    description: 'Plant the seeds of change and watch your positive impact on the environment grow with every action.',
+    title: 'Earn Eco-points',
+    description: 'Redeem your rewards for making sustainable choices and contributing to a greener planet.',
     icon: <Sprout className="h-full w-full text-green-500" />,
     color: "from-green-500/20 to-lime-300/20"
   }
@@ -55,19 +55,20 @@ export const OnboardingSlider = ({ onComplete, onSkip }: OnboardingSliderProps) 
 
       {/* Skip button */}
       <div className="flex justify-end p-4">
-        <motion.button 
+        <motion.div 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          variant="ghost" 
-          size="sm" 
-          className="text-foreground/70 hover:text-foreground transition-colors flex items-center gap-1 px-3 py-1 rounded-full bg-background/50 backdrop-blur-sm" 
-          onClick={onSkip}
         >
-          Skip <X className="h-3.5 w-3.5 ml-1" />
-        </motion.button>
+          <button 
+            className="text-foreground/70 hover:text-foreground transition-colors flex items-center gap-1 px-3 py-1 rounded-full bg-background/50 backdrop-blur-sm" 
+            onClick={onSkip}
+          >
+            Skip <X className="h-3.5 w-3.5 ml-1" />
+          </button>
+        </motion.div>
       </div>
 
       {/* Content area */}
@@ -150,7 +151,7 @@ export const OnboardingSlider = ({ onComplete, onSkip }: OnboardingSliderProps) 
       </div>
 
       {/* Next button */}
-      <div className="px-8 pb-8">
+      <div className="px-8 pb-8 absolute bottom-0 left-0 right-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
