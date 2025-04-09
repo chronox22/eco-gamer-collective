@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,7 +6,6 @@ import { OnboardingSlider } from '@/components/OnboardingSlider';
 import { toast } from 'sonner';
 import { Leaf, ArrowLeft, Cloud, TreeDeciduous, Sprout } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import ChronoXLogo from '/chrono-x-logo.png';  // Import the logo
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -183,8 +181,14 @@ const AuthPage = () => {
                   className="flex items-center justify-center mb-3"
                   whileHover={{ scale: 1.05 }}
                 >
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-400/30 to-emerald-500/30 rounded-full blur-md"></div>
+                    <div className="relative bg-gradient-to-r from-green-400 to-emerald-500 h-14 w-14 rounded-full flex items-center justify-center shadow-lg">
+                      <Leaf className="h-7 w-7 text-white" />
+                    </div>
+                  </div>
                   <motion.h1 
-                    className="text-3xl font-bold text-white"
+                    className="text-3xl font-bold text-white ml-3"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6, delay: 0.4 }}
