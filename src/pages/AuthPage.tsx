@@ -183,11 +183,6 @@ const AuthPage = () => {
                   className="flex items-center justify-center mb-3"
                   whileHover={{ scale: 1.05 }}
                 >
-                  <img 
-                    src={https://i.ibb.co/L3zmTRT/CHRCC.png} 
-                    alt="ChronoX Logo" 
-                    className="h-14 w-14 mr-3" 
-                  />
                   <motion.h1 
                     className="text-3xl font-bold text-white"
                     initial={{ opacity: 0, x: -20 }}
