@@ -184,7 +184,7 @@ const AuthPage = () => {
                   whileHover={{ scale: 1.05 }}
                 >
                   <img 
-                    src={ChronoXLogo} 
+                    src={https://scontent.fmnl17-5.fna.fbcdn.net/v/t1.15752-9/484016871_1795539701015523_1392230472783915642_n.png?_nc_cat=110&ccb=1-7&_nc_sid=0024fc&_nc_eui2=AeG8moZ5XJmd1h3EskrfnPq4ReYhi0s2ZEhF5iGLSzZkSNdQNUFoBB4FJgEyS31GRAvHjXXsY8ig07ALTBG5Xlsv&_nc_ohc=f_wU71ca-EYQ7kNvwED3D8_&_nc_oc=AdlJeiSrRaqB6o3EVaREyTbGVOv26wrcxgvr7Sbomhl6u2tL1G8NXRpNk2Ac6C1R37A&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.fmnl17-5.fna&oh=03_Q7cD2AH4mJvCMooFPCRTtEpIGaojmhU3NAUszrv2nez-LKk81A&oe=681DD04B} 
                     alt="ChronoX Logo" 
                     className="h-14 w-14 mr-3" 
                   />
